@@ -5,4 +5,4 @@ mobile/bower_components/
 node_modules*
 
 #Built file by grunt
-mobile/built/main.js
+mobile/assets/built/main.js

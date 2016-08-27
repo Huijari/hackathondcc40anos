@@ -10,9 +10,11 @@ import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import com.firebase.client.Firebase;
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private ImageView imageView;
     private WebView webView;
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    private Button btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +50,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         webView.addJavascriptInterface(new WebAppInterface(this), "Android");
         webView.loadUrl("http://www.google.com");
+
+        btn = (Button) findViewById(R.id.button);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dispatchTakePictureIntent();
+            }
+        });
 
         //Firebase.setAndroidContext(this);
     }
@@ -87,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             imageView.setImageBitmap(imageBitmap);
+
         }
     }
 

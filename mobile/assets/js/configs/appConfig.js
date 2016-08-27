@@ -22,15 +22,19 @@ app.config(function($routeProvider, $locationProvider){
 		firebase.initializeApp(config);
 
 		$locationProvider.html5Mode({
-			enabled: true,
+			enabled: false,
 			requireBase: false
 		});
 
 		$routeProvider
-			.when(initialPath, {
-				templateUrl : 'assets/templates/login.html',
-				controller: 'LoginController'
-			})
+            .when(initialPath, {
+                templateUrl : 'assets/templates/login.html',
+                controller: 'LoginController'
+            })
+            .when('/photo', {
+                templateUrl : 'assets/templates/photo.html',
+                controller: 'PhotoController'
+            })
 			.otherwise({
 				redirectTo: initialPath
 			});

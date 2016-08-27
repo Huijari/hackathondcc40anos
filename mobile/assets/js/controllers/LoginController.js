@@ -5,7 +5,7 @@ var app = angular.module('ClassPictures');
 app.controller('LoginController', ['$scope', '$location', LoginController]);
 
 function LoginController($scope, $location) {
-
+	
 	var user;
 	var isToLogin = true;
 	var userToken;

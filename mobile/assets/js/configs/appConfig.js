@@ -23,7 +23,7 @@ app.config(function($routeProvider, $locationProvider){
 		firebase.initializeApp(config);
 
 		$locationProvider.html5Mode({
-			enabled: true,
+			enabled: false,
 			requireBase: false
 		});
 
@@ -32,8 +32,8 @@ app.config(function($routeProvider, $locationProvider){
 				templateUrl: 'assets/templates/login.html',
 				controller: 'LoginController'
 			})
-			.when('selectClasses', {
-				templateUrl : 'assets/templates/classesSelection.html'
+			.when(initialPath + 'selectClasses', {
+				templateUrl : 'assets/templates/classSelection.html'
 			})
 			.when(initialPath + "classesList", {
 				templateUrl: 'assets/templates/classes-list.html',

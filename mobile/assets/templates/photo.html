@@ -18,15 +18,14 @@
         <div flex-xs flex-gt-xs="100" layout="column">
           <md-card>
             <img ng-src="{{image.path}}" class="md-card-image" alt="{{image.alt}}">
-            <!-- <md-card-title>
-            </md-card-title> -->
             <md-card-actions layout="row" layout-align="space-between center">
               <md-card-title-text>
                 <span class="md-headline" ng-bind="image.timestamp"/>
               </md-card-title-text>
-              <md-switch ng-model="image.isPublic" aria-label="Público">
-                {{ image.isPublic }}
-              </md-switch>
+              <div layout="column" layout-align="space-around center">
+                  <md-tooltip md-direction="left">Público</md-tooltip>
+                  <md-switch ng-model="image.isPublic" aria-label="Público"/>
+              </div>
             </md-card-actions>
             <md-card-content>
               <span ng-bind="image.desc"/>

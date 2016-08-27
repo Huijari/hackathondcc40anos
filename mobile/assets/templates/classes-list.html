@@ -1,0 +1,24 @@
+<div ng-controller="LoginController as menuCtrl">
+
+	<!-- Sidenav menu -->
+	<pp-sidenav></pp-sidenav>
+
+	<!-- Toolbar -->
+	<md-toolbar class="md-hue-2">
+		<div class="md-toolbar-tools">
+			<!-- Menu button -->
+			<div ng-controller="SidenavController as sidenavCtrl">
+				<md-button class="md-icon-button" aria-label="Menu" ng-click="sidenavCtrl.openSideMenu()">
+					<md-icon md-svg-icon="assets/images/icons/ic_view_headline_white_24px.svg"></md-icon>
+				</md-button>
+			</div>
+			<!-- Title -->
+			<h2>
+				<span>Lista de Disciplinas</span>
+			</h2>
+			<span flex=""></span>
+		</div>
+	</md-toolbar>
+	
+
+</div>

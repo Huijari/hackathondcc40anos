@@ -30,10 +30,14 @@ app.config(function($routeProvider, $locationProvider){
 		});
 
 		$routeProvider
-			.when(initialPath, {
-				templateUrl: 'assets/templates/login.html',
-				controller: 'LoginController'
-			})
+            .when(initialPath, {
+                templateUrl : 'assets/templates/login.html',
+                controller: 'LoginController'
+            })
+            .when('/photo', {
+                templateUrl : 'assets/templates/photo.html',
+                controller: 'PhotoController'
+            })
 			.when('selectClasses', {
 				templateUrl : 'assets/templates/classesSelection.html'
 			})
@@ -80,21 +84,6 @@ app.directive('ppSidenav', function() {
 
 
 
-/* FILE: mobile/assets/js/directives/classesSelectList.js */
-(function () {
-
-var app = angular.module("ClassPictures");
-
-app.directive('classesSelect', function() {
-	return {
-		restrict: 'E',
-		link: function(scope, element, attrs) {},
-		templateUrl: 'assets/templates/classesSelect.html'
-	};
-});
-
-})();
-
 /* FILE: mobile/assets/js/services/ClassService.js */
 (function () {
 
@@ -140,99 +129,63 @@ app.controller('ClassesListController', ['$scope', ClassesListController]);
 
 function ClassesListController($scope) {
 
+	this.groupCountMessage = function groupCountMessage(group) {
+		var groupCount = group.members? group.members.length : 0;
+		var message = groupCount + (groupCount > 1 ? ' members' : ' member');
+		return message;
+	};
+
+	this.addGroup = function addGroup() {
+		$location.path(window.location.pathname +'createGroup');
+	};
+
+	this.openGroup = function openGroup(group){
+		$location.path(window.location.pathname +'group');
+		GroupService.setOpenedGroup(group);
+	};
 	
+	function buildSampleGroups() {
+		$scope.groups = [
+			{
+				id: 1,
+				name: 'Calculo Diferencial Integral III',
+				imagePath: 'https://unsplash.it/80/80/'
+			},
+			{
+				id: 2,
+				name: 'Fundamentos de Mecânia dos sólidos e Fluidos',
+				imagePath: 'https://unsplash.it/70/70/'
+			},
+			{
+				id: 3,
+				name: 'Equaçoes Diferencias A',
+				lastPosition: 'Favelinha loka',
+				members: [1, 2],
+				imagePath: 'https://unsplash.it/90/90/'
+			},
+			{
+				id: 4,
+				name: 'Laboratório de Sistemas Digitais',
+				lastPosition: 'There is no last position to show',
+				members: [1, 2],
+				imagePath: 'https://unsplash.it/100/100/'
+			},
+			{
+				id: 5,
+				name: 'Análise de circuitos elétricos II',
+				lastPosition: 'Teknisa Service',
+				members: [1, 2],
+				imagePath: 'https://unsplash.it/110/110/'
+			}
+		];
+	}
+
+	buildSampleGroups();
 }
 
 })();
 
 
-
-/* FILE: mobile/assets/js/controllers/ClassesSelectController.js */
-(function() {
-
-	var app = angular.module("ClassPictures");
-	app.controller('ClassesSelectController', ['$scope', ClassesSelectController]);
-
-	function ClassesSelectController($scope) {
-
-		$scope.allClasses = [
-			{
-				"nome_materia": "PROBABILIDADE",
-				"codigo_materia": "EST032",
-				"turma": "TM2",
-				"hora_inicial": "13:00",
-				"hora_final": "14:40",
-				"dia_semana": "Ter-Qui",
-				"nome_sala": "1014"
-			},
-			{
-				"nome_materia": "ESTATISTICA E PROBABILIDADES",
-				"codigo_materia": "EST031",
-				"turma": "TB1",
-				"hora_inicial": "09:25",
-				"hora_final": "11:05",
-				"dia_semana": "Ter-Qui",
-				"nome_sala": "1015"
-			},
-			{
-				"nome_materia": "ESTATISTICA E PROBABILIDADES",
-				"codigo_materia": "EST031",
-				"turma": "TE",
-				"hora_inicial": "19:00",
-				"hora_final": "20:40",
-				"dia_semana": "Ter",
-				"nome_sala": "1015"
-			},
-			{
-				"nome_materia": "ESTATISTICA E PROBABILIDADES",
-				"codigo_materia": "EST031",
-				"turma": "TE",
-				"hora_inicial": "20:55",
-				"hora_final": "22:35",
-				"dia_semana": "Qui",
-				"nome_sala": "1015"
-			},
-			{
-				"nome_materia": "ESTATISTICA E PROBABILIDADES",
-				"codigo_materia": "EST031",
-				"turma": "TW",
-				"hora_inicial": "19:00",
-				"hora_final": "20:40",
-				"dia_semana": "Seg-Qua",
-				"nome_sala": "1015"
-			},
-			{
-				"nome_materia": "PROBABILIDADE",
-				"codigo_materia": "EST032",
-				"turma": "TE",
-				"hora_inicial": "20:55",
-				"hora_final": "22:35",
-				"dia_semana": "Ter",
-				"nome_sala": "1015"
-			},
-			{
-				"nome_materia": "PROBABILIDADE",
-				"codigo_materia": "EST032",
-				"turma": "TE",
-				"hora_inicial": "19:00",
-				"hora_final": "20:40",
-				"dia_semana": "Qui",
-				"nome_sala": "1015"
-			},
-			{
-				"nome_materia": "PROBABILIDADE",
-				"codigo_materia": "EST032",
-				"turma": "TM1",
-				"hora_inicial": "13:00",
-				"hora_final": "14:40",
-				"dia_semana": "Ter-Qui",
-				"nome_sala": "1015"
-			}
-		];
-
-	}
-
-})();
 
 /* FILE: mobile/assets/js/controllers/LoginController.js */
 (function () {
@@ -259,6 +212,24 @@ function LoginController($scope, $location) {
 })();
 
 
+
+/* FILE: mobile/assets/js/controllers/PhotoController.js */
+(function () {
+
+var app = angular.module('ClassPictures');
+
+app.controller('PhotoController', ['$scope', PhotoController]);
+
+function PhotoController($scope) {
+    $scope.image = {};
+    $scope.image.path = 'http://lorempixel.com/420/420/';
+    $scope.image.timestamp = "1472322628";
+    $scope.image.owner = "Faboiola";
+    $scope.image.isPublic = false;
+    $scope.image.alt = "TESTE";
+    $scope.image.desc = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+}
+})();
 
 /* FILE: mobile/assets/js/controllers/SidenavController.js */
 (function () {

@@ -2,9 +2,9 @@
 
 var app = angular.module('ClassPictures');
 
-app.controller('ClassesListController', ['$scope', ClassesListController]);
+app.controller('ClassesListController', ['$scope', '$location', ClassesListController]);
 
-function ClassesListController($scope) {
+function ClassesListController($scope, $location) {
 
 	this.groupCountMessage = function groupCountMessage(group) {
 		var groupCount = group.members? group.members.length : 0;
@@ -17,14 +17,13 @@ function ClassesListController($scope) {
 	};
 
 	this.openGroup = function openGroup(group){
-		$location.path(window.location.pathname +'group');
-		GroupService.setOpenedGroup(group);
+		$location.path(window.location.pathname + 'class/' + group.id);
 	};
 	
 	function buildSampleGroups() {
 		$scope.groups = [
 			{
-				id: 1,
+				id: 'EST032TM2',
 				name: 'Calculo Diferencial Integral III',
 				imagePath: 'https://unsplash.it/80/80/'
 			},

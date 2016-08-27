@@ -4,6 +4,7 @@ var app = angular.module("ClassPictures", ["ngRoute", "ngMaterial"]);
 
 app.config(function($routeProvider, $locationProvider){
 		var initialPath = window.location.pathname;
+		window.initialPath = initialPath;
 
     // Install Service Worker
     navigator.serviceWorker

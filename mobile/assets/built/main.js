@@ -6,8 +6,23 @@ var app = angular.module("ClassPictures", ["ngRoute", "ngMaterial"]);
 
 app.config(function($routeProvider, $locationProvider){
 		var initialPath = window.location.pathname;
+		window.initialPath = initialPath;
 
-		
+    // Install Service Worker
+    navigator.serviceWorker
+      .register('/service-worker.js')
+      .then(function() {
+        console.log('SW Install');
+      });
+
+		// Initialize Firebase
+		var config = {
+			apiKey: "AIzaSyBDcoldmE8SFUwXf5fxjj4Bzf9lijazHps",
+			authDomain: "classpictures-5313f.firebaseapp.com",
+			databaseURL: "https://classpictures-5313f.firebaseio.com",
+			storageBucket: "classpictures-5313f.appspot.com",
+		};
+		firebase.initializeApp(config);
 
 		$locationProvider.html5Mode({
 			enabled: true,
@@ -31,20 +46,11 @@ app.config(function($routeProvider, $locationProvider){
 app.run(function($location){
 		
 
-	// Initialize Firebase
-		var config = {
-			apiKey: "AIzaSyBDcoldmE8SFUwXf5fxjj4Bzf9lijazHps",
-			authDomain: "classpictures-5313f.firebaseapp.com",
-			databaseURL: "https://classpictures-5313f.firebaseio.com",
-			storageBucket: "classpictures-5313f.appspot.com",
-		};
-		firebase.initializeApp(config);
-
-		firebase.auth().getRedirectResult().then(function(result){
-			if (result.user) {
-				$location.path(window.location.pathname +'classesList');
-			}
-		}); 
+	firebase.auth().getRedirectResult().then(function(result){
+		if (result.user) {
+			$location.path(window.location.pathname +'classesList');
+		}
+	}); 
 
 		
 });
@@ -102,16 +108,9 @@ function LoginController($scope, $location) {
 	var self = this;
 	var provider = new firebase.auth.GoogleAuthProvider();
 	provider.addScope('https://www.googleapis.com/auth/plus.login');
-	
-	// firebase.auth().getRedirectResult().then(function(result){
-	// 	if (result.user) {
-	// 		$location.path(window.location.pathname +'classesList');
-	// 	}
-	// }); 
-	
 
 	$scope.loginWithGoogleClick = function(){
-		firebase.auth().signInWithRedirect(provider);		
+		firebase.auth().signInWithRedirect(provider);
 	};
 	
 }
@@ -125,10 +124,64 @@ function LoginController($scope, $location) {
 
 var app = angular.module("ClassPictures");
 
-app.controller("SidenavController", ["$scope", "$mdSidenav", function($scope, $mdSidenav){
-	this.openSideMenu = function(){
+app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", function($scope, $location, $mdSidenav){
+	
+	var self = this;
+	
+	this.openSideMenu = function openSideMenu(){
 		$mdSidenav('left').toggle();
 	};
+
+	this.setUserInfo = function setUserInfo(){
+		var user = firebase.auth().currentUser;
+		$scope.userName = user.displayName;
+		$scope.userProfileImage = user.photoURL;
+		$scope.userStatus = "Yesterday u said tomorrow!";
+	};
+
+	this.logOut = function logOut(){
+		firebase.auth().signOut().then(function(){
+			$location.path(window.initialPath);
+			$scope.$apply();
+		});
+	};
+
+	function buildLeftNavSettings () {
+		$scope.settings = [
+			{
+				settingName: "Visibilidade",
+				iconPath: "assets/images/icons/ic_visibility_black_24px.svg",
+				onClickMethod: self.oi,
+				isCheckbox : true,
+				checked : true
+			},
+			{
+				settingName: "Perfil",
+				iconPath: "assets/images/icons/ic_person_black_24px.svg",
+				onClickMethod: self.oi,
+				isCheckbox : false,
+				checked : false
+			},
+			{
+				settingName: "Conta",
+				iconPath: "assets/images/icons/ic_vpn_key_black_24px.svg",
+				onClickMethod: self.oi,
+				isCheckbox : false,
+				checked : false
+			},
+			{
+				settingName: "Logout",
+				iconPath: "assets/images/icons/ic_exit_to_app_black_24px.svg",
+				onClickMethod: self.logOut,
+				isCheckbox : false,
+				checked : false
+			}
+
+		];
+	}
+
+	buildLeftNavSettings();
+	this.setUserInfo();
 }]);
 
 })();

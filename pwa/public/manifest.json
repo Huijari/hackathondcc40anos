@@ -4,8 +4,12 @@
   "version": 1,
   "default_language": "ptBR",
   "description": "Galeria com taggeamento automático baseado no horário das turmas UFMG",
-  "icons": {
-    "144": "icon.png"
-  },
-  "short_name": "ClassPictures"
+  "display": "standalone",
+  "icons": [{
+    "src": "icon.png",
+    "sizes": "144x144",
+    "type": "image/png"
+  }],
+  "short_name": "ClassPictures",
+  "start_url": "/index.html"
 }

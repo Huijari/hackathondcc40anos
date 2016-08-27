@@ -36,8 +36,8 @@ app.config(function($routeProvider, $locationProvider){
                 templateUrl : 'assets/templates/photo.html',
                 controller: 'PhotoController'
             })
-			.when('selectClasses', {
-				templateUrl : 'assets/templates/classesSelection.html'
+			.when(initialPath + 'selectClasses', {
+				templateUrl : 'assets/templates/classSelection.html'
 			})
 			.when(initialPath + "classesList", {
 				templateUrl: 'assets/templates/classes-list.html',

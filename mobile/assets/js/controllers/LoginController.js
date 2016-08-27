@@ -17,7 +17,7 @@ function LoginController($scope, $location) {
 	    if (!firebase.auth().currentUser) {
 	      firebase.auth().signInWithRedirect(provider);
 	    } else {
-	      $location.path(initialPath + 'classesList');
+	      $location.path('/classesList');
 	    }
 	};
 

@@ -26,11 +26,11 @@ app.config(function($routeProvider, $locationProvider){
 
 		$locationProvider.html5Mode({
 			enabled: false,
-			requireBase: true
+			requireBase: false
 		});
 
 		$routeProvider
-            .when(initialPath, {
+            .when("/", {
                 templateUrl : 'assets/templates/login.html',
                 controller: 'LoginController'
             })
@@ -38,10 +38,10 @@ app.config(function($routeProvider, $locationProvider){
                 templateUrl : 'assets/templates/photo.html',
                 controller: 'PhotoController'
             })
-			.when('selectClasses', {
-				templateUrl : 'assets/templates/classesSelection.html'
+			.when('/selectClasses', {
+				templateUrl : 'assets/templates/classSelection.html'
 			})
-			.when(initialPath + "classesList", {
+			.when("/classesList", {
 				templateUrl: 'assets/templates/classes-list.html',
 				controller: 'ClassesListController'
 			})
@@ -264,7 +264,7 @@ function LoginController($scope, $location) {
 	    if (!firebase.auth().currentUser) {
 	      firebase.auth().signInWithRedirect(provider);
 	    } else {
-	      $location.path(initialPath + 'classesList');
+	      $location.path('/classesList');
 	    }
 	};
 
@@ -322,7 +322,7 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 		});
 	};
 	this.chama = function() {
-		$location.path(window.initialPath + "selectClasses");
+		$location.path("/selectClasses");
 	};
 
 	function buildLeftNavSettings () {

@@ -6,6 +6,7 @@ var app = angular.module("ClassPictures", ["ngRoute", "ngMaterial"]);
 
 app.config(function($routeProvider, $locationProvider){
 		var initialPath = window.location.pathname;
+		window.initialPath = initialPath;
 
     // Install Service Worker
     navigator.serviceWorker
@@ -30,19 +31,52 @@ app.config(function($routeProvider, $locationProvider){
 
 		$routeProvider
 			.when(initialPath, {
-				templateUrl : 'assets/templates/login.html',
+				templateUrl: 'assets/templates/login.html',
 				controller: 'LoginController'
 			})
 			.when('selectClasses', {
 				templateUrl : 'assets/templates/classesSelection.html'
+			})
+			.when(initialPath + "classesList", {
+				templateUrl: 'assets/templates/classes-list.html',
+				controller: 'ClassesListController'
 			})
 			.otherwise({
 				redirectTo: initialPath
 			});
 });
 
+app.run(function($location){
+		
+
+	firebase.auth().getRedirectResult().then(function(result){
+		if (result.user) {
+			$location.path(window.location.pathname +'classesList');
+		}
+	}); 
+
+		
+});
+
 })();
 
+
+
+
+/* FILE: mobile/assets/js/directives/Sidenav.js */
+(function () {
+
+var app = angular.module("ClassPictures");
+
+app.directive('ppSidenav', function() {
+	return {
+		restrict: 'E',
+		link: function(scope, element, attrs) {},
+		templateUrl: 'assets/templates/sidenav.html'
+	};
+});
+
+})();
 
 
 
@@ -60,6 +94,58 @@ app.directive('classesSelect', function() {
 });
 
 })();
+
+/* FILE: mobile/assets/js/services/ClassService.js */
+(function () {
+
+var app = angular.module('ClassPictures');
+
+app.factory('Class', [ClassFactory]);
+
+function ClassFactory() {
+  var service = {};
+
+  service.getById = function(id) {
+    return firebase.database().ref('class/' + id);
+  };
+
+  return service;
+}
+})();
+
+
+/* FILE: mobile/assets/js/controllers/ClassController.js */
+(function () {
+
+var app = angular.module('ClassPictures');
+
+app.controller('ClassController', ['$scope', '$routeParams', 'Class', ClassController]);
+
+function ClassController($scope, $routeParams, Class) {
+  $scope.class = {};
+  Class.getById($routeParams.class).on('value', function(snapshot) {
+    $scope.class = snapshot.val();
+    $scope.$apply();
+  });
+}
+})();
+
+
+/* FILE: mobile/assets/js/controllers/ClassesListController.js */
+(function () {
+
+var app = angular.module('ClassPictures');
+
+app.controller('ClassesListController', ['$scope', ClassesListController]);
+
+function ClassesListController($scope) {
+
+	
+}
+
+})();
+
+
 
 /* FILE: mobile/assets/js/controllers/ClassesSelectController.js */
 (function() {
@@ -156,28 +242,87 @@ var app = angular.module('ClassPictures');
 app.controller('LoginController', ['$scope', '$location', LoginController]);
 
 function LoginController($scope, $location) {
-	//$location.path(window.location.pathname + "classesSelect");
+
+	var user;
+	var isToLogin = true;
+	var userToken;
+	var self = this;
+	var provider = new firebase.auth.GoogleAuthProvider();
+	provider.addScope('https://www.googleapis.com/auth/plus.login');
+
 	$scope.loginWithGoogleClick = function(){
-		var provider = new firebase.auth.GoogleAuthProvider();
-	    firebase.auth().signInWithRedirect(provider).then(function(result) {
-		  // This gives you a Google Access Token. You can use it to access the Google API.
-		  var token = result.credential.accessToken;
-		  // The signed-in user info.
-		  var user = result.user;
-		  // ...
-		}).catch(function(error) {	
-		  // Handle Errors here.
-		  var errorCode = error.code;
-		  var errorMessage = error.message;
-		  // The email of the user's account used.
-		  var email = error.email;
-		  // The firebase.auth.AuthCredential type that was used.
-		  var credential = error.credential;
-		  // ...
-		});
+		firebase.auth().signInWithRedirect(provider);
 	};
 	
 }
 
 })();
 
+
+
+/* FILE: mobile/assets/js/controllers/SidenavController.js */
+(function () {
+
+var app = angular.module("ClassPictures");
+
+app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", function($scope, $location, $mdSidenav){
+	
+	var self = this;
+	
+	this.openSideMenu = function openSideMenu(){
+		$mdSidenav('left').toggle();
+	};
+
+	this.setUserInfo = function setUserInfo(){
+		var user = firebase.auth().currentUser;
+		$scope.userName = user.displayName;
+		$scope.userProfileImage = user.photoURL;
+		$scope.userStatus = "Yesterday u said tomorrow!";
+	};
+
+	this.logOut = function logOut(){
+		firebase.auth().signOut().then(function(){
+			$location.path(window.initialPath);
+			$scope.$apply();
+		});
+	};
+
+	function buildLeftNavSettings () {
+		$scope.settings = [
+			{
+				settingName: "Visibilidade",
+				iconPath: "assets/images/icons/ic_visibility_black_24px.svg",
+				onClickMethod: self.oi,
+				isCheckbox : true,
+				checked : true
+			},
+			{
+				settingName: "Perfil",
+				iconPath: "assets/images/icons/ic_person_black_24px.svg",
+				onClickMethod: self.oi,
+				isCheckbox : false,
+				checked : false
+			},
+			{
+				settingName: "Conta",
+				iconPath: "assets/images/icons/ic_vpn_key_black_24px.svg",
+				onClickMethod: self.oi,
+				isCheckbox : false,
+				checked : false
+			},
+			{
+				settingName: "Logout",
+				iconPath: "assets/images/icons/ic_exit_to_app_black_24px.svg",
+				onClickMethod: self.logOut,
+				isCheckbox : false,
+				checked : false
+			}
+
+		];
+	}
+
+	buildLeftNavSettings();
+	this.setUserInfo();
+}]);
+
+})();

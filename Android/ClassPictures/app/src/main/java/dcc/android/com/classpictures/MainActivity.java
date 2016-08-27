@@ -22,24 +22,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
-    private GoogleApiClient mGoogleApiClient; import com.google.android.gms.auth.api.Auth;
+    private GoogleApiClient mGoogleApiClient;
 
-    import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-    import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-    import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-    import com.google.android.gms.common.ConnectionResult;
-    import com.google.android.gms.common.SignInButton;
-    import com.google.android.gms.common.api.GoogleApiClient;
-    import com.google.android.gms.tasks.OnCompleteListener;
-    import com.google.android.gms.tasks.OnFailureListener;
-    import com.google.android.gms.tasks.OnSuccessListener;
-    import com.google.android.gms.tasks.Task;
-    import com.google.firebase.auth.AuthCredential;
-    import com.google.firebase.auth.AuthResult;
-    import com.google.firebase.auth.FirebaseAuth;
-    import com.google.firebase.auth.FirebaseUser;
-    import com.google.firebase.auth.GoogleAuthProvider;
-    private FirebaseAuth mFirebaseAuth;
     private ImageView imageView;
     private WebView webView;
     static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -111,18 +95,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+
+        /*mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity , this  OnConnectionFailedListener )
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
         // Initialize FirebaseAuth
-        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseAuth = FirebaseAuth.getInstance();*/
     }
 
     private void signIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        /*Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN); */
     }
 
 }

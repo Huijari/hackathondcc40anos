@@ -31,6 +31,9 @@ app.config(function($routeProvider, $locationProvider){
 				templateUrl : 'assets/templates/login.html',
 				controller: 'LoginController'
 			})
+			.when('selectClasses', {
+				templateUrl : 'assets/templates/classesSelection.html'
+			})
 			.otherwise({
 				redirectTo: initialPath
 			});

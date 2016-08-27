@@ -24,7 +24,7 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 		});
 	};
 	this.chama = function() {
-		$location.path(window.initialPath + "selectClasses");
+		$location.path("/selectClasses");
 	};
 
 	function buildLeftNavSettings () {

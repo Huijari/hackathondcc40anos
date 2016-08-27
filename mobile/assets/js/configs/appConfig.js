@@ -28,7 +28,7 @@ app.config(function($routeProvider, $locationProvider){
 		});
 
 		$routeProvider
-            .when(initialPath, {
+            .when("/", {
                 templateUrl : 'assets/templates/login.html',
                 controller: 'LoginController'
             })
@@ -36,10 +36,10 @@ app.config(function($routeProvider, $locationProvider){
                 templateUrl : 'assets/templates/photo.html',
                 controller: 'PhotoController'
             })
-			.when(initialPath + 'selectClasses', {
+			.when('/selectClasses', {
 				templateUrl : 'assets/templates/classSelection.html'
 			})
-			.when(initialPath + "classesList", {
+			.when("/classesList", {
 				templateUrl: 'assets/templates/classes-list.html',
 				controller: 'ClassesListController'
 			})

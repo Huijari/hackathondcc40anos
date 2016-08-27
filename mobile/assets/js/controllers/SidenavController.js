@@ -14,7 +14,7 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 		var user = firebase.auth().currentUser || {};
 		$scope.userName = user.displayName;
 		$scope.userProfileImage = user.photoURL;
-		$scope.userStatus = "Yesterday u said tomorrow!";
+		$scope.userEmail = user.email;
 	};
 
 	this.logOut = function logOut(){

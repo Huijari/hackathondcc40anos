@@ -1,0 +1,8 @@
+<div ng-controller="ClassController as menuCtrl">
+  <span ng-bind="class.name"></span>
+  <md-grid-list md-cols="4" md-gutter="1em" md-row-height="4:3">
+    <md-grid-tile ng-repeat="image in class.images">
+      <img ng-src="{{image.url}}">
+    </md-grid-tile>
+  </md-grid-list>
+</div>

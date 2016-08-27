@@ -30,32 +30,36 @@ app.config(function($routeProvider, $locationProvider){
 		});
 
 		$routeProvider
-			.when(initialPath, {
-				templateUrl: 'assets/templates/login.html',
-				controller: 'LoginController'
-			})
-			.when(initialPath + 'selectClasses', {
-				templateUrl : 'assets/templates/classSelection.html'
+            .when(initialPath, {
+                templateUrl : 'assets/templates/login.html',
+                controller: 'LoginController'
+            })
+            .when('/photo/:classId/:imageId', {
+                templateUrl : 'assets/templates/photo.html',
+                controller: 'PhotoController'
+            })
+			.when('selectClasses', {
+				templateUrl : 'assets/templates/classesSelection.html'
 			})
 			.when(initialPath + "classesList", {
 				templateUrl: 'assets/templates/classes-list.html',
 				controller: 'ClassesListController'
 			})
+            .when('/class/:class', {
+              templateUrl: 'assets/templates/gallery.html',
+              controller: 'ClassController'
+            })
 			.otherwise({
 				redirectTo: initialPath
 			});
 });
 
 app.run(function($location){
-		
-
 	firebase.auth().getRedirectResult().then(function(result){
 		if (result.user) {
 			$location.path(window.location.pathname +'classesList');
 		}
-	}); 
-
-		
+	});
 });
 
 })();
@@ -114,19 +118,76 @@ function ClassFactory() {
 })();
 
 
+/* FILE: mobile/assets/js/services/ImageService.js */
+(function () {
+
+var app = angular.module('ClassPictures');
+
+app.factory('Image', [ImageFactory]);
+
+function ImageFactory() {
+  var service = {};
+
+  service.getByClass = function(id) {
+    return firebase.storage().ref(id);
+  };
+
+  service.getImage = function(classId, imageId) {
+    return service.getByClass(classId).child(imageId).getDownloadURL();
+  };
+
+  service.getImageMetadata = function(classId, imageId) {
+    return firebase.database().ref(classId+'/images/'+imageId-1);
+  };
+
+  return service;
+}
+})();
+
+
+/* FILE: mobile/assets/js/services/UserService.js */
+(function () {
+
+var app = angular.module('ClassPictures');
+
+app.service('UserService', [UserService]);
+
+function UserService() {
+
+	var openedGroup;
+
+	this.setOpenedGroup= function(group){
+		openedGroup = group;
+	};
+
+	this.getOpenedGroup = function(){
+		return openedGroup; 
+	};
+}
+
+})();
+
 /* FILE: mobile/assets/js/controllers/ClassController.js */
 (function () {
 
 var app = angular.module('ClassPictures');
 
-app.controller('ClassController', ['$scope', '$routeParams', 'Class', ClassController]);
+app.controller('ClassController', ['$scope', '$routeParams', 'Class', 'Image', ClassController]);
 
-function ClassController($scope, $routeParams, Class) {
+function ClassController($scope, $routeParams, Class, Image) {
   $scope.class = {};
   Class.getById($routeParams.class).on('value', function(snapshot) {
     $scope.class = snapshot.val();
+    $scope.class.images.forEach(function(image) {
+      Image.getByClass($routeParams.class).child(image.id + '.jpg')
+        .getDownloadURL().then(function(url) {
+          image.url = url;
+          $scope.$apply();
+        });
+    });
     $scope.$apply();
   });
+  console.log(Image.getByClass($routeParams.class));
 }
 })();
 
@@ -140,7 +201,58 @@ app.controller('ClassesListController', ['$scope', ClassesListController]);
 
 function ClassesListController($scope) {
 
+	this.countMemberClass = function countMemberClass(group) {
+		var groupCount = group.members? group.members.length : 0;
+		var message = groupCount + (groupCount > 1 ? ' members' : ' member');
+		return message;
+	};
+
+	this.addClasses = function addClasses() {
+		$location.path(window.location.pathname +'createGroup');
+	};
+
+	this.openGroup = function openGroup(group){
+		$location.path(window.location.pathname +'group');
+		GroupService.setOpenedGroup(group);
+	};
 	
+	function buildSampleGroups() {
+		$scope.groups = [
+			{
+				id: 1,
+				name: 'Calculo Diferencial Integral III',
+				imagePath: 'https://unsplash.it/80/80/'
+			},
+			{
+				id: 2,
+				name: 'Fundamentos de Mecânia dos sólidos e Fluidos',
+				imagePath: 'https://unsplash.it/70/70/'
+			},
+			{
+				id: 3,
+				name: 'Equaçoes Diferencias A',
+				lastPosition: 'Favelinha loka',
+				members: [1, 2],
+				imagePath: 'https://unsplash.it/90/90/'
+			},
+			{
+				id: 4,
+				name: 'Laboratório de Sistemas Digitais',
+				lastPosition: 'There is no last position to show',
+				members: [1, 2],
+				imagePath: 'https://unsplash.it/100/100/'
+			},
+			{
+				id: 5,
+				name: 'Análise de circuitos elétricos II',
+				lastPosition: 'Teknisa Service',
+				members: [1, 2],
+				imagePath: 'https://unsplash.it/110/110/'
+			}
+		];
+	}
+
+	buildSampleGroups();
 }
 
 })();
@@ -281,14 +393,40 @@ function LoginController($scope, $location) {
 	provider.addScope('https://www.googleapis.com/auth/plus.login');
 
 	$scope.loginWithGoogleClick = function(){
-		firebase.auth().signInWithRedirect(provider);
+    if (!firebase.auth().currentUser) {
+      firebase.auth().signInWithRedirect(provider);
+    }
+    else {
+      $location.path('classesList');
+    }
 	};
-	
+
 }
 
 })();
 
 
+
+/* FILE: mobile/assets/js/controllers/PhotoController.js */
+(function () {
+
+var app = angular.module('ClassPictures');
+
+app.controller('PhotoController', ['$scope', '$routeParams', 'Image', PhotoController]);
+
+function PhotoController($scope, $routeParams, Image) {
+    $scope.image = {};
+
+    Image.getImage($routeParams.classId, $routeParams.imageId).then(function(URL) {
+      $scope.image.path = URL;
+      Image.getImageMetadata($routeParams.classId, $routeParams.imageId).on('value', function(snapshot) {
+        $scope.image = snapshot.val();
+        $scope.image.date = new Date($scope.image.timestamp*1000).toLocaleString();
+        $scope.$apply();
+      });
+    });
+}
+})();
 
 /* FILE: mobile/assets/js/controllers/SidenavController.js */
 (function () {
@@ -307,7 +445,7 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 		var user = firebase.auth().currentUser || {};
 		$scope.userName = user.displayName;
 		$scope.userProfileImage = user.photoURL;
-		$scope.userStatus = "Yesterday u said tomorrow!";
+		$scope.userEmail = user.email;
 	};
 
 	this.logOut = function logOut(){

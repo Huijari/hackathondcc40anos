@@ -28,32 +28,36 @@ app.config(function($routeProvider, $locationProvider){
 		});
 
 		$routeProvider
-			.when(initialPath, {
-				templateUrl: 'assets/templates/login.html',
-				controller: 'LoginController'
-			})
-			.when(initialPath + 'selectClasses', {
-				templateUrl : 'assets/templates/classSelection.html'
+            .when(initialPath, {
+                templateUrl : 'assets/templates/login.html',
+                controller: 'LoginController'
+            })
+            .when('/photo/:classId/:imageId', {
+                templateUrl : 'assets/templates/photo.html',
+                controller: 'PhotoController'
+            })
+			.when('selectClasses', {
+				templateUrl : 'assets/templates/classesSelection.html'
 			})
 			.when(initialPath + "classesList", {
 				templateUrl: 'assets/templates/classes-list.html',
 				controller: 'ClassesListController'
 			})
+            .when('/class/:class', {
+              templateUrl: 'assets/templates/gallery.html',
+              controller: 'ClassController'
+            })
 			.otherwise({
 				redirectTo: initialPath
 			});
 });
 
 app.run(function($location){
-		
-
 	firebase.auth().getRedirectResult().then(function(result){
 		if (result.user) {
 			$location.path(window.location.pathname +'classesList');
 		}
-	}); 
-
-		
+	});
 });
 
 })();

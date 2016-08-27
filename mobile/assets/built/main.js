@@ -25,8 +25,8 @@ app.config(function($routeProvider, $locationProvider){
 		firebase.initializeApp(config);
 
 		$locationProvider.html5Mode({
-			enabled: true,
-			requireBase: false
+			enabled: false,
+			requireBase: true
 		});
 
 		$routeProvider
@@ -34,7 +34,7 @@ app.config(function($routeProvider, $locationProvider){
                 templateUrl : 'assets/templates/login.html',
                 controller: 'LoginController'
             })
-            .when('/photo', {
+            .when('/photo/:classId/:imageId', {
                 templateUrl : 'assets/templates/photo.html',
                 controller: 'PhotoController'
             })
@@ -45,21 +45,21 @@ app.config(function($routeProvider, $locationProvider){
 				templateUrl: 'assets/templates/classes-list.html',
 				controller: 'ClassesListController'
 			})
+            .when('/class/:class', {
+              templateUrl: 'assets/templates/gallery.html',
+              controller: 'ClassController'
+            })
 			.otherwise({
 				redirectTo: initialPath
 			});
 });
 
 app.run(function($location){
-		
-
 	firebase.auth().getRedirectResult().then(function(result){
 		if (result.user) {
 			$location.path(window.location.pathname +'classesList');
 		}
-	}); 
-
-		
+	});
 });
 
 })();
@@ -103,19 +103,76 @@ function ClassFactory() {
 })();
 
 
+/* FILE: mobile/assets/js/services/ImageService.js */
+(function () {
+
+var app = angular.module('ClassPictures');
+
+app.factory('Image', [ImageFactory]);
+
+function ImageFactory() {
+  var service = {};
+
+  service.getByClass = function(id) {
+    return firebase.storage().ref(id);
+  };
+
+  service.getImage = function(classId, imageId) {
+    return service.getByClass(classId).child(imageId).getDownloadURL();
+  };
+
+  service.getImageMetadata = function(classId, imageId) {
+    return firebase.database().ref(classId+'/images/'+imageId-1);
+  };
+
+  return service;
+}
+})();
+
+
+/* FILE: mobile/assets/js/services/UserService.js */
+(function () {
+
+var app = angular.module('ClassPictures');
+
+app.service('UserService', [UserService]);
+
+function UserService() {
+
+	var userClasses = [];
+
+	this.getsUerClasses = function(){
+		return userClasses; 
+	};
+
+	this.addUserClass = function(userClass){
+		userClasses.concat(userClass);
+	};
+}
+
+})();
+
 /* FILE: mobile/assets/js/controllers/ClassController.js */
 (function () {
 
 var app = angular.module('ClassPictures');
 
-app.controller('ClassController', ['$scope', '$routeParams', 'Class', ClassController]);
+app.controller('ClassController', ['$scope', '$routeParams', 'Class', 'Image', ClassController]);
 
-function ClassController($scope, $routeParams, Class) {
+function ClassController($scope, $routeParams, Class, Image) {
   $scope.class = {};
   Class.getById($routeParams.class).on('value', function(snapshot) {
     $scope.class = snapshot.val();
+    $scope.class.images.forEach(function(image) {
+      Image.getByClass($routeParams.class).child(image.id + '.jpg')
+        .getDownloadURL().then(function(url) {
+          image.url = url;
+          $scope.$apply();
+        });
+    });
     $scope.$apply();
   });
+  console.log(Image.getByClass($routeParams.class));
 }
 })();
 
@@ -129,13 +186,13 @@ app.controller('ClassesListController', ['$scope', ClassesListController]);
 
 function ClassesListController($scope) {
 
-	this.groupCountMessage = function groupCountMessage(group) {
+	this.countMemberClass = function countMemberClass(group) {
 		var groupCount = group.members? group.members.length : 0;
 		var message = groupCount + (groupCount > 1 ? ' members' : ' member');
 		return message;
 	};
 
-	this.addGroup = function addGroup() {
+	this.addClasses = function addClasses() {
 		$location.path(window.location.pathname +'createGroup');
 	};
 
@@ -195,7 +252,7 @@ var app = angular.module('ClassPictures');
 app.controller('LoginController', ['$scope', '$location', LoginController]);
 
 function LoginController($scope, $location) {
-
+	
 	var user;
 	var isToLogin = true;
 	var userToken;
@@ -204,9 +261,13 @@ function LoginController($scope, $location) {
 	provider.addScope('https://www.googleapis.com/auth/plus.login');
 
 	$scope.loginWithGoogleClick = function(){
-		firebase.auth().signInWithRedirect(provider);
+	    if (!firebase.auth().currentUser) {
+	      firebase.auth().signInWithRedirect(provider);
+	    } else {
+	      $location.path(initialPath + 'classesList');
+	    }
 	};
-	
+
 }
 
 })();
@@ -218,16 +279,19 @@ function LoginController($scope, $location) {
 
 var app = angular.module('ClassPictures');
 
-app.controller('PhotoController', ['$scope', PhotoController]);
+app.controller('PhotoController', ['$scope', '$routeParams', 'Image', PhotoController]);
 
-function PhotoController($scope) {
+function PhotoController($scope, $routeParams, Image) {
     $scope.image = {};
-    $scope.image.path = 'http://lorempixel.com/420/420/';
-    $scope.image.timestamp = "1472322628";
-    $scope.image.owner = "Faboiola";
-    $scope.image.isPublic = false;
-    $scope.image.alt = "TESTE";
-    $scope.image.desc = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+
+    Image.getImage($routeParams.classId, $routeParams.imageId).then(function(URL) {
+      $scope.image.path = URL;
+      Image.getImageMetadata($routeParams.classId, $routeParams.imageId).on('value', function(snapshot) {
+        $scope.image = snapshot.val();
+        $scope.image.date = new Date($scope.image.timestamp*1000).toLocaleString();
+        $scope.$apply();
+      });
+    });
 }
 })();
 
@@ -245,10 +309,10 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 	};
 
 	this.setUserInfo = function setUserInfo(){
-		var user = firebase.auth().currentUser;
+		var user = firebase.auth().currentUser || {};
 		$scope.userName = user.displayName;
 		$scope.userProfileImage = user.photoURL;
-		$scope.userStatus = "Yesterday u said tomorrow!";
+		$scope.userEmail = user.email;
 	};
 
 	this.logOut = function logOut(){
@@ -256,6 +320,9 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 			$location.path(window.initialPath);
 			$scope.$apply();
 		});
+	};
+	this.chama = function() {
+		$location.path(window.initialPath + "selectClasses");
 	};
 
 	function buildLeftNavSettings () {
@@ -278,6 +345,13 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 				settingName: "Conta",
 				iconPath: "assets/images/icons/ic_vpn_key_black_24px.svg",
 				onClickMethod: self.oi,
+				isCheckbox : false,
+				checked : false
+			},
+			{
+				settingName: "Tela do Fabio",
+				iconPath: "assets/images/icons/ic_exit_to_app_black_24px.svg",
+				onClickMethod: self.chama ,
 				isCheckbox : false,
 				checked : false
 			},

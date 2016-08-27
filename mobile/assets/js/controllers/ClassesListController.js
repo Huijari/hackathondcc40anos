@@ -6,13 +6,13 @@ app.controller('ClassesListController', ['$scope', '$location', ClassesListContr
 
 function ClassesListController($scope, $location) {
 
-	this.groupCountMessage = function groupCountMessage(group) {
+	this.countMemberClass = function countMemberClass(group) {
 		var groupCount = group.members? group.members.length : 0;
 		var message = groupCount + (groupCount > 1 ? ' members' : ' member');
 		return message;
 	};
 
-	this.addGroup = function addGroup() {
+	this.addClasses = function addClasses() {
 		$location.path(window.location.pathname +'createGroup');
 	};
 

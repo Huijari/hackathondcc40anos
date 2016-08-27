@@ -24,7 +24,7 @@ app.config(function($routeProvider, $locationProvider){
 
 		$locationProvider.html5Mode({
 			enabled: false,
-			requireBase: false
+			requireBase: true
 		});
 
 		$routeProvider

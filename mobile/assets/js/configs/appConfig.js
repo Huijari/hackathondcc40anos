@@ -23,7 +23,7 @@ app.config(function($routeProvider, $locationProvider){
 		firebase.initializeApp(config);
 
 		$locationProvider.html5Mode({
-			enabled: true,
+			enabled: false,
 			requireBase: false
 		});
 
@@ -32,7 +32,7 @@ app.config(function($routeProvider, $locationProvider){
                 templateUrl : 'assets/templates/login.html',
                 controller: 'LoginController'
             })
-            .when('/photo', {
+            .when('/photo/:classId/:imageId', {
                 templateUrl : 'assets/templates/photo.html',
                 controller: 'PhotoController'
             })
@@ -43,25 +43,21 @@ app.config(function($routeProvider, $locationProvider){
 				templateUrl: 'assets/templates/classes-list.html',
 				controller: 'ClassesListController'
 			})
-      .when('/class/:class', {
-        templateUrl: 'assets/templates/gallery.html',
-        controller: 'ClassController'
-      })
+            .when('/class/:class', {
+              templateUrl: 'assets/templates/gallery.html',
+              controller: 'ClassController'
+            })
 			.otherwise({
 				redirectTo: initialPath
 			});
 });
 
 app.run(function($location){
-		
-
 	firebase.auth().getRedirectResult().then(function(result){
 		if (result.user) {
 			$location.path(window.location.pathname +'classesList');
 		}
-	}); 
-
-		
+	});
 });
 
 })();

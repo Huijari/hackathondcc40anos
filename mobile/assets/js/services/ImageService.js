@@ -11,6 +11,14 @@ function ImageFactory() {
     return firebase.storage().ref(id);
   };
 
+  service.getImage = function(classId, imageId) {
+    return service.getByClass(classId).child(imageId).getDownloadURL();
+  };
+
+  service.getImageMetadata = function(classId, imageId) {
+    return firebase.database().ref(classId+'/images/'+imageId-1);
+  };
+
   return service;
 }
 })();

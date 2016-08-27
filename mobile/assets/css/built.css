@@ -13,3 +13,7 @@
 #name-menu-card {
 	font-size: 18px;
 }
+
+#add-class-buttom {
+	position: fixed !important;
+}

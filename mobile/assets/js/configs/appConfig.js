@@ -22,7 +22,7 @@ app.config(function($routeProvider, $locationProvider){
 		firebase.initializeApp(config);
 
 		$locationProvider.html5Mode({
-			enabled: false,
+			enabled: true,
 			requireBase: false
 		});
 

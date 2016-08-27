@@ -8,7 +8,9 @@ app.config(function($routeProvider, $locationProvider){
     // Install Service Worker
     navigator.serviceWorker
       .register('/service-worker.js')
-      .then(() => console.log('SW Install'));
+      .then(function() {
+        console.log('SW Install');
+      });
 
 		// Initialize Firebase
 		var config = {

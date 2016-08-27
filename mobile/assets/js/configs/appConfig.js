@@ -31,6 +31,10 @@ app.config(function($routeProvider, $locationProvider){
 				templateUrl : 'assets/templates/login.html',
 				controller: 'LoginController'
 			})
+      .when('/class/:class', {
+        templateUrl: 'assets/templates/gallery.html',
+        controller: 'ClassController'
+      })
 			.otherwise({
 				redirectTo: initialPath
 			});

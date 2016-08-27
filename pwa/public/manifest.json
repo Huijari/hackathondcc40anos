@@ -4,7 +4,7 @@
   "version": 1,
   "default_language": "ptBR",
   "description": "Galeria com taggeamento automático baseado no horário das turmas UFMG",
-  "display": "standalone",
+  "display": "fullscreen",
   "icons": [{
     "src": "icon.png",
     "sizes": "144x144",

@@ -1,0 +1,8 @@
+# Bower files
+mobile/bower_components/
+
+#Node files
+node_modules*
+
+#Built file by grunt
+mobile/built/main.js

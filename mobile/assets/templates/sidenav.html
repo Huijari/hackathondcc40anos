@@ -1,0 +1,32 @@
+<div ng-controller="SidenavController as sidenavCtrl">
+	<md-sidenav md-component-id="left" class="md-sidenav-left">
+		<md-toolbar class="md-theme-light md-toolbar-tools" >
+			<md-icon ng-click='sidenavCtrl.openSideMenu()' md-svg-icon="assets/images/icons/ic_chevron_left_white_24px.svg"></md-icon>
+			<h1 class="md-toolbar-tools">Class Pictures</h1>
+		</md-toolbar>
+		<md-list>
+			<!-- Card Menu Profile -->
+			<md-card>
+				<md-card-title>
+					<md-card-title-media>
+						<img id='perfil-menu-img' ng-src="{{userProfileImage}}" class="md-avatar" />
+					</md-card-title-media>
+					<md-card-title-text id='info-card-menu'>
+						<span id='name-menu-card' class="md-headline">{{userName}}</span>
+						<span id='status-menu-card' class="md-subhead description">{{userStatus}}</span>
+					</md-card-title-text>
+				</md-card-title>
+			</md-card>
+
+			<!-- Settings Menu -->
+			<md-subheader class="md-no-sticky">Settings</md-subheader>
+			<md-divider></md-divider>
+			<md-list-item ng-repeat="setting in settings" ng-click= 'setting.onClickMethod()'>
+				<md-icon ng-if="setting.iconPath" md-svg-icon="{{setting.iconPath}}"></md-icon>
+				<p> {{ setting.settingName }} </p>
+				<md-switch ng-if="setting.isCheckbox" class="md-secondary" ng-model="setting.checked"></md-switch>
+			<md-divider></md-divider>
+			</md-list-item>
+		</md-list>
+	</md-sidenav>
+</div>

@@ -4,6 +4,7 @@ var app = angular.module("ClassPictures", ["ngRoute", "ngMaterial"]);
 
 app.config(function($routeProvider, $locationProvider){
 		var initialPath = window.location.pathname;
+		window.initialPath = initialPath;
 
     // Install Service Worker
     navigator.serviceWorker
@@ -35,9 +36,28 @@ app.config(function($routeProvider, $locationProvider){
                 templateUrl : 'assets/templates/photo.html',
                 controller: 'PhotoController'
             })
+			.when('selectClasses', {
+				templateUrl : 'assets/templates/classesSelection.html'
+			})
+			.when(initialPath + "classesList", {
+				templateUrl: 'assets/templates/classes-list.html',
+				controller: 'ClassesListController'
+			})
 			.otherwise({
 				redirectTo: initialPath
 			});
+});
+
+app.run(function($location){
+		
+
+	firebase.auth().getRedirectResult().then(function(result){
+		if (result.user) {
+			$location.path(window.location.pathname +'classesList');
+		}
+	}); 
+
+		
 });
 
 })();

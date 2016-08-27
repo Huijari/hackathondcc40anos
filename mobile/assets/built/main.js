@@ -252,7 +252,7 @@ var app = angular.module('ClassPictures');
 app.controller('LoginController', ['$scope', '$location', LoginController]);
 
 function LoginController($scope, $location) {
-
+	
 	var user;
 	var isToLogin = true;
 	var userToken;
@@ -309,7 +309,7 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 	};
 
 	this.setUserInfo = function setUserInfo(){
-		var user = firebase.auth().currentUser;
+		var user = firebase.auth().currentUser || {};
 		$scope.userName = user.displayName;
 		$scope.userProfileImage = user.photoURL;
 		$scope.userEmail = user.email;
@@ -320,6 +320,9 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 			$location.path(window.initialPath);
 			$scope.$apply();
 		});
+	};
+	this.chama = function() {
+		$location.path(window.initialPath + "selectClasses");
 	};
 
 	function buildLeftNavSettings () {
@@ -342,6 +345,13 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 				settingName: "Conta",
 				iconPath: "assets/images/icons/ic_vpn_key_black_24px.svg",
 				onClickMethod: self.oi,
+				isCheckbox : false,
+				checked : false
+			},
+			{
+				settingName: "Tela do Fabio",
+				iconPath: "assets/images/icons/ic_exit_to_app_black_24px.svg",
+				onClickMethod: self.chama ,
 				isCheckbox : false,
 				checked : false
 			},

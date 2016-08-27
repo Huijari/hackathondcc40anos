@@ -14,12 +14,11 @@ function LoginController($scope, $location) {
 	provider.addScope('https://www.googleapis.com/auth/plus.login');
 
 	$scope.loginWithGoogleClick = function(){
-    if (!firebase.auth().currentUser) {
-      firebase.auth().signInWithRedirect(provider);
-    }
-    else {
-      $location.path('classesList');
-    }
+	    if (!firebase.auth().currentUser) {
+	      firebase.auth().signInWithRedirect(provider);
+	    } else {
+	      $location.path(initialPath + 'classesList');
+	    }
 	};
 
 }

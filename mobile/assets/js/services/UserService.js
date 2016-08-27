@@ -6,14 +6,14 @@ app.service('UserService', [UserService]);
 
 function UserService() {
 
-	var openedGroup;
+	var userClasses = [];
 
-	this.setOpenedGroup= function(group){
-		openedGroup = group;
+	this.getsUerClasses = function(){
+		return userClasses; 
 	};
 
-	this.getOpenedGroup = function(){
-		return openedGroup; 
+	this.addUserClass = function(userClass){
+		userClasses.concat(userClass);
 	};
 }
 

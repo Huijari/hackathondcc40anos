@@ -5,6 +5,13 @@ var app = angular.module("ClassPictures", ["ngRoute", "ngMaterial"]);
 app.config(function($routeProvider, $locationProvider){
 		var initialPath = window.location.pathname;
 
+    // Install Service Worker
+    navigator.serviceWorker
+      .register('/service-worker.js')
+      .then(function() {
+        console.log('SW Install');
+      });
+
 		// Initialize Firebase
 		var config = {
 			apiKey: "AIzaSyBDcoldmE8SFUwXf5fxjj4Bzf9lijazHps",

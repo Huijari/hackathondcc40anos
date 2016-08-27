@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2,
+  "name": "ClassPictures",
+  "version": 1,
+  "default_language": "ptBR",
+  "description": "Galeria com taggeamento automático baseado no horário das turmas UFMG",
+  "display": "fullscreen",
+  "icons": [{
+    "src": "icon.png",
+    "sizes": "144x144",
+    "type": "image/png"
+  }],
+  "short_name": "ClassPictures",
+  "start_url": "/index.html"
+}

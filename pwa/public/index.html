@@ -8,6 +8,16 @@
   <body>
     <script src="flood.js"></script>
     <script src="vdom.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase.js"></script>
+    <script>
+      firebase.initializeApp({
+        apiKey: "AIzaSyBDcoldmE8SFUwXf5fxjj4Bzf9lijazHps",
+        authDomain: "classpictures-5313f.firebaseapp.com",
+        databaseURL: "https://classpictures-5313f.firebaseio.com",
+        storageBucket: "classpictures-5313f.appspot.com",
+      });
+    </script>
+    <script src="app.js"></script>
     <script>
       navigator.serviceWorker
         .register('service-worker.js')

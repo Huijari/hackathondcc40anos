@@ -45,6 +45,10 @@ app.config(function($routeProvider, $locationProvider){
 				templateUrl: 'assets/templates/classes-list.html',
 				controller: 'ClassesListController'
 			})
+      .when('/class/:class', {
+        templateUrl: 'assets/templates/gallery.html',
+        controller: 'ClassController'
+      })
 			.otherwise({
 				redirectTo: initialPath
 			});
@@ -103,6 +107,47 @@ function ClassFactory() {
 })();
 
 
+/* FILE: mobile/assets/js/services/ImageService.js */
+(function () {
+
+var app = angular.module('ClassPictures');
+
+app.factory('Image', [ImageFactory]);
+
+function ImageFactory() {
+  var service = {};
+
+  service.getByClass = function(id) {
+    return firebase.storage().ref(id);
+  };
+
+  return service;
+}
+})();
+
+
+/* FILE: mobile/assets/js/services/UserService.js */
+(function () {
+
+var app = angular.module('ClassPictures');
+
+app.service('UserService', [UserService]);
+
+function UserService() {
+
+	var openedGroup;
+
+	this.setOpenedGroup= function(group){
+		openedGroup = group;
+	};
+
+	this.getOpenedGroup = function(){
+		return openedGroup; 
+	};
+}
+
+})();
+
 /* FILE: mobile/assets/js/controllers/ClassController.js */
 (function () {
 
@@ -129,13 +174,13 @@ app.controller('ClassesListController', ['$scope', ClassesListController]);
 
 function ClassesListController($scope) {
 
-	this.groupCountMessage = function groupCountMessage(group) {
+	this.countMemberClass = function countMemberClass(group) {
 		var groupCount = group.members? group.members.length : 0;
 		var message = groupCount + (groupCount > 1 ? ' members' : ' member');
 		return message;
 	};
 
-	this.addGroup = function addGroup() {
+	this.addClasses = function addClasses() {
 		$location.path(window.location.pathname +'createGroup');
 	};
 
@@ -248,7 +293,7 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 		var user = firebase.auth().currentUser;
 		$scope.userName = user.displayName;
 		$scope.userProfileImage = user.photoURL;
-		$scope.userStatus = "Yesterday u said tomorrow!";
+		$scope.userEmail = user.email;
 	};
 
 	this.logOut = function logOut(){

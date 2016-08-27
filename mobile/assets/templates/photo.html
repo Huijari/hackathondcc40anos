@@ -17,10 +17,10 @@
       <md-content class="md-padding" layout-xs="column" layout="row">
         <div flex-xs flex-gt-xs="100" layout="column">
           <md-card>
-            <img ng-src="{{image.path}}" class="md-card-image" alt="{{image.alt}}">
+            <img ng-src="{{image.path}}" class="md-card-image">
             <md-card-actions layout="row" layout-align="space-between center">
               <md-card-title-text>
-                <span class="md-headline" ng-bind="image.timestamp"/>
+                <span class="md-headline" ng-bind="image.date"/>
               </md-card-title-text>
               <div layout="column" layout-align="space-around center">
                   <md-tooltip md-direction="left">Público</md-tooltip>
@@ -28,7 +28,7 @@
               </div>
             </md-card-actions>
             <md-card-content>
-              <span ng-bind="image.desc"/>
+              <span ng-bind="image.description"/>
             </md-card-content>
           </md-card>
         </div>

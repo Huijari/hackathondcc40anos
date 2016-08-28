@@ -18,17 +18,10 @@
      Esta turma ainda não possui nenhuma foto :(
    </div>
    <md-card ng-repeat="image in class.images" ng-click="gotoImage(image)">
-      <img ng-src="{{image.url}}" class="md-card-image" alt="Washed Out">
-      <md-card-actions layout="row" layout-align="end center">
-          <span>{{showDate(+image.id)}}</span>
-        <md-button class="md-icon-button" aria-label="Favorite">
-        </md-button>
-        <md-button class="md-icon-button" aria-label="Settings">
-          <md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
-        </md-button>
-        <md-button class="md-icon-button" aria-label="Share">
-          <md-icon md-svg-icon="img/icons/share-arrow.svg"></md-icon>
-        </md-button>
+      <img ng-src="{{image.url}}" class="md-card-image">
+      <md-card-actions layout="row" layout-align="space-between center">
+        <span>{{showDate(+image.id)}}</span>
+        <span>{{image.owner.name}}</span>
       </md-card-actions>
     </md-card>
   </md-content>

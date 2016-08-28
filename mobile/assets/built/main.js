@@ -10,7 +10,7 @@ app.config(function($routeProvider, $locationProvider){
 
     // Install Service Worker
     navigator.serviceWorker
-      .register('/service-worker.js')
+      .register('../../../service-worker.js')
       .then(function() {
         console.log('SW Install');
       });
@@ -57,7 +57,7 @@ app.config(function($routeProvider, $locationProvider){
 app.run(function($location){
 	firebase.auth().getRedirectResult().then(function(result){
 		if (result.user) {
-			$location.path(window.location.pathname +'classesList');
+			$location.path('/classesList');
 		}
 	});
 });
@@ -179,7 +179,7 @@ function ClassController($scope, $routeParams, Class, Image) {
   Class.getById($routeParams.class).on('value', function(snapshot) {
     $scope.class = snapshot.val();
     $scope.class.images.forEach(function(image) {
-      Image.getByClass($routeParams.class).child(image.id + '.jpg')
+      Image.getByClass($routeParams.class).child(''+image.id)
         .getDownloadURL().then(function(url) {
           image.url = url;
           $scope.$apply();
@@ -197,9 +197,15 @@ function ClassController($scope, $routeParams, Class, Image) {
 
 var app = angular.module('ClassPictures');
 
-app.controller('ClassesListController', ['$scope', ClassesListController]);
+app.controller('ClassesListController', ['$scope', '$location', ClassesListController]);
 
-function ClassesListController($scope) {
+function ClassesListController($scope, $location) {
+
+	$scope.addClassButtonLabel = "Editar disciplinas cadastradas";
+
+	$scope.addNewClassClick = function(){
+		console.log("Adicionar nova disciplina");
+	};
 
 	this.countMemberClass = function countMemberClass(group) {
 		var groupCount = group.members? group.members.length : 0;
@@ -208,18 +214,18 @@ function ClassesListController($scope) {
 	};
 
 	this.addClasses = function addClasses() {
-		$location.path(window.location.pathname +'createGroup');
+		$location.path('/createGroup');
 	};
 
 	this.openGroup = function openGroup(group){
-		$location.path(window.location.pathname +'group');
+		$location.path('/group');
 		GroupService.setOpenedGroup(group);
 	};
 	
 	function buildSampleGroups() {
-		$scope.groups = [
+		$scope.classes = [
 			{
-				id: 1,
+				id: 'EST032TM2',
 				name: 'Calculo Diferencial Integral III',
 				imagePath: 'https://unsplash.it/80/80/'
 			},
@@ -236,23 +242,23 @@ function ClassesListController($scope) {
 				imagePath: 'https://unsplash.it/90/90/'
 			},
 			{
+				id: 5,
+				name: 'Análise de circuitos elétricos II',
+				lastPosition: 'Teknisa Service',
+				members: [1, 2],
+				imagePath: 'assets/images/icons/ic_view_headline_white_24px.svg'
+			},
+			{
 				id: 4,
 				name: 'Laboratório de Sistemas Digitais',
 				lastPosition: 'There is no last position to show',
 				members: [1, 2],
 				imagePath: 'https://unsplash.it/100/100/'
-			},
-			{
-				id: 5,
-				name: 'Análise de circuitos elétricos II',
-				lastPosition: 'Teknisa Service',
-				members: [1, 2],
-				imagePath: 'https://unsplash.it/110/110/'
 			}
 		];
 	}
-
 	buildSampleGroups();
+
 }
 
 })();
@@ -340,6 +346,9 @@ function ClassesListController($scope) {
 
 		self.querySearch = querySearch;
 		self.selectedItemChange = selectedItemChange;
+		self.removeSelection = function(classe){
+			$scope.selectedClasses.splice($scope.selectedClasses.indexOf(classe),1);
+		}
 		function querySearch(query) {
 			var results = query ? $scope.allClasses.filter(createFilterFor(query)) : $scope.allClasses;
 			return results;
@@ -367,7 +376,7 @@ function ClassesListController($scope) {
 						return ~angular.lowercase(classe[prop]).indexOf(word);
 					});
 					return b; 
-				});;
+				});
 				return a; 
 			};
 		}
@@ -449,10 +458,10 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 
 	this.logOut = function logOut(){
 		firebase.auth().signOut().then(function(){
-			$location.path(window.initialPath);
-			$scope.$apply();
+			$location.path("/");
 		});
 	};
+
 	this.chama = function() {
 		$location.path("/selectClasses");
 	};

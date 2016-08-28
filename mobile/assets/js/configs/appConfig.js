@@ -8,7 +8,7 @@ app.config(function($routeProvider, $locationProvider){
 
     // Install Service Worker
     navigator.serviceWorker
-      .register('../../../service-worker.js')
+      .register('service-worker.js')
       .then(function() {
         console.log('SW Install');
       });
@@ -55,7 +55,7 @@ app.config(function($routeProvider, $locationProvider){
 app.run(function($location){
 	firebase.auth().getRedirectResult().then(function(result){
 		if (result.user) {
-			$location.path(window.location.pathname +'classesList');
+			$location.path('/classesList');
 		}
 	});
 });

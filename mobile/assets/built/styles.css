@@ -19,3 +19,9 @@
 #add-class-buttom {
 	position: fixed !important;
 }
+
+#label-add-class {
+	font-weight: bold;
+	align-self: center;
+	color: #ff4081;
+}

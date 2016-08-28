@@ -7,13 +7,14 @@ app.controller('PhotoController', ['$scope', '$routeParams', 'Image', PhotoContr
 function PhotoController($scope, $routeParams, Image) {
     $scope.image = {};
 
-    Image.getImage($routeParams.classId, $routeParams.imageId).then(function(URL) {
-      $scope.image.path = URL;
-      Image.getImageMetadata($routeParams.classId, $routeParams.imageId).on('value', function(snapshot) {
+    Image.getImageMetadata($routeParams.classId, $routeParams.imageId).on('value', function(snapshot) {
         $scope.image = snapshot.val();
-        $scope.image.date = new Date($scope.image.timestamp*1000).toLocaleString();
+        $scope.image.date = new Date($scope.image.id).toLocaleString();
+        $scope.image.title = $scope.image.owner + ': ' + $scope.image.date;
         $scope.$apply();
-      });
+	    Image.getImage($routeParams.classId, $scope.image.id).getDownloadURL().then(function(URL) {
+	        $scope.image.path = URL;
+	    });
     });
 }
 })();

@@ -22,8 +22,8 @@ function ClassesListController($scope, $location) {
 		$location.path('/createGroup');
 	};
 
-	this.openGroup = function openGroup(group){
-    $location.path(window.location.pathname + 'class/' + group.id);
+	this.openClass = function openClass(group){
+    	$location.path('class/' + group.id);
 	};
 
 	function buildSampleGroups() {

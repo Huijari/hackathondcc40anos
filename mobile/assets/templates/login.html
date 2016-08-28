@@ -1,18 +1,15 @@
-<div ng-controller="LoginController as menuCtrl">
-	<!-- Toolbar -->
-	<md-container layout-align="center center">
-		<md-toolbar class="md-hue-2">
-			<div class="md-toolbar-tools">
-				<!-- Title -->
-				<h2>
-					<span>Class Pictures</span>
-				</h2>
-				<span flex=""></span>
-			</div>
-		</md-toolbar>
-		<section layout="row" layout-sm="column" layout-align="center center" layout-wrap="">
-	      <md-button class="md-warn md-raised md-hue-2" ng-click="loginWithGoogleClick()">Logar com o Google</md-button>
-	    </section>
-	<md-container>
+<div ng-controller="LoginController as menuCtrl" id ="page-splash" layout-align="center">
+
+
+	<div layout="column" id="content" role="main" ng-controller="LoginController as menuCtrl">
+		<div layout="column" layout-align="center center" layout-fill>	
+			<h1 id="logo-text">Class Pictures</h1>
+			<br>
+			<md-button class="md-raised md-hue-2 display-flex" ng-click="loginWithGoogleClick()">
+				<md-icon md-svg-icon="assets/images/icons/google.svg" id="google-svg"></md-icon>
+				<h1 id='google-login-font'>Entrar com a conta google</h1>
+			</md-button>
+		</div>
+	</div>
 
 </div>

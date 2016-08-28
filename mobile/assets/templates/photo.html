@@ -1,15 +1,18 @@
-<div ng-controller="PhotoController as menuCtrl">
-    <!-- Toolbar -->
-    <md-toolbar class="md-hue-2">
-        <div class="md-toolbar-tools">
-            <!-- Title -->
-            <h2>
-                <span>Class Pictures</span>
-            </h2>
-            <span flex=""></span>
-        </div>
-    </md-toolbar>
+<pp-sidenav></pp-sidenav>
+<md-toolbar class="md-hue-2">
+  <div class="md-toolbar-tools">
+    <div ng-controller="SidenavController as sidenavCtrl">
+      <md-button class="md-icon-button" aria-label="Menu" ng-click="sidenavCtrl.openSideMenu()">
+        <md-icon md-svg-icon="assets/images/icons/ic_view_headline_white_24px.svg"></md-icon>
+      </md-button>
+    </div>
+    <h2>
+      <span ng-bind="class.name"></span>
+    </h2>
+  </div>
+</md-toolbar>
 
+<div ng-controller="PhotoController as menuCtrl">
     <div ng-controller="PhotoController" ng-cloak>
       <md-content class="md-padding" layout-xs="column" layout="row">
         <div flex-xs flex-gt-xs="100" layout="column">
@@ -21,11 +24,14 @@
               </md-card-title-text>
               <div layout="column" layout-align="space-around center">
                   <md-tooltip md-direction="left">Público</md-tooltip>
-                  <md-switch ng-model="image.isPublic" aria-label="Público"/>
+                  <md-switch ng-model="image.isPublic" ng-disabled="checkEdit()" ng-change="onChange('isPublic')" aria-label="Público"/>
               </div>
             </md-card-actions>
             <md-card-content>
-              <span ng-bind="image.description"/>
+              <md-input-container layout>
+                <label>Description</label>
+                <textarea ng-disabled="checkEdit()" ng-change="onChange('description')" ng-model="image.description"></textarea>
+              </md-input-container>
             </md-card-content>
           </md-card>
         </div>

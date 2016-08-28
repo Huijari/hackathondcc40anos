@@ -209,7 +209,10 @@ function ClassController($scope, $routeParams, Class, Image) {
         uploadTask.on('complete', function() {
           Class.getById($routeParams.class).ref('images').push({
             id: imageId,
-            owner: firebase.auth().currentUser.displayName,
+            owner: {
+              id: firebase.auth().currentUser.id,
+              name: firebase.auth().currentUser.displayName
+            },
             description: '',
             isPublic: true
           });
@@ -245,8 +248,8 @@ function ClassesListController($scope, $location) {
 		$location.path('/createGroup');
 	};
 
-	this.openGroup = function openGroup(group){
-    $location.path(window.location.pathname + 'class/' + group.id);
+	this.openClass = function openClass(group){
+    	$location.path('class/' + group.id);
 	};
 
 	function buildSampleGroups() {
@@ -436,32 +439,52 @@ function LoginController($scope, $location) {
 
 var app = angular.module('ClassPictures');
 
-app.controller('PhotoController', ['$scope', '$routeParams', 'Image', PhotoController]);
+app.controller('PhotoController', ['$scope', '$routeParams', 'Image', 'Class', PhotoController]);
 
-function PhotoController($scope, $routeParams, Image) {
+function PhotoController($scope, $routeParams, Image, Class) {
     $scope.image = {};
 
+    //FOR NARNIA
+    $scope.safeApply = function(fn) {
+        var phase = this.$root.$$phase;
+        if(phase == '$apply' || phase == '$digest') {
+            if(fn && (typeof(fn) === 'function')) {
+                fn();
+            }
+        } else {
+            this.$apply(fn);
+        }
+    };
+
     var metaData = Image.getImageMetadata($routeParams.classId, $routeParams.imageId);
+
+    Class.getById($routeParams.classId).on('value', function(snapshot) {
+        $scope.class = snapshot.val();
+        $scope.safeApply();
+    });
+
     metaData.on('value', function(snapshot) {
         $scope.image = snapshot.val();
         $scope.image.date = new Date($scope.image.id).toLocaleString();
-        $scope.image.title = $scope.image.owner + ': ' + $scope.image.date;
-        $scope.$apply();
+        $scope.image.title = $scope.image.owner.name + ': ' + $scope.image.date;
+        $scope.safeApply();
 	    Image.getImage($routeParams.classId, $scope.image.id).getDownloadURL().then(function(URL) {
 	        $scope.image.path = URL;
-	    });
+            $scope.safeApply();
+	    }.bind(this));
+
     });
 
-    metaData.set({
-        id: $scope.image.id,
-        owner: $scope.image.owner,
-        description: $scope.image.description,
-        isPublic: $scope.image.isPublic
-    }).then(function() {
-        console.log('Synchronization succeeded');
-    }).catch(function(error) {
-        console.log('Synchronization failed: ' + error);
-    });
+    $scope.onChange = function(key) {
+        var payload = {};
+        payload[key] = $scope.image[key];
+
+        metaData.update(payload);
+    };
+
+    $scope.checkEdit = function() {
+        return ($scope.image.owner)? $scope.image.owner.id !== firebase.auth().currentUser.uid : true;
+    };
 }
 })();
 

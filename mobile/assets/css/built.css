@@ -1,3 +1,6 @@
+@import 'https://fonts.googleapis.com/css?family=Roboto';
+@import 'https://fonts.googleapis.com/css?family=Lato';
+
 #perfil-menu-img {
 	border-radius: 50%;
 }
@@ -27,4 +30,46 @@ img {
 	font-weight: bold;
 	align-self: center;
 	color: #ff4081;
+}
+
+#page-splash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0288D1;
+    background: radial-gradient(circle, #039BE5, #01579b);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    flex-direction: column;
+}
+
+#google-login-font {
+	color: #757575;
+	font-size: 16px;
+	font-family: Roboto;
+	text-transform: initial;
+	padding-right: 15px;
+}
+
+.display-flex {
+	display: flex;
+}
+
+.display-block {
+	display: block;
+}
+
+#google-svg {
+	padding-right: 15px;
+}
+
+#logo-text {
+	font-family: Lato;
+	font-size: 3em;
+	letter-spacing: 2px;
 }

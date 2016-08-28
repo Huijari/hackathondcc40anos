@@ -308,6 +308,16 @@ function ClassesListController($scope, $location, Image, Class, UserService, $in
           if (classe) {
             if (checkDay(classe) && checkHoraInicial(classe) && checkHoraFinal(classe)) {
               $scope.actual = classe;
+              var inicial = classe.hora_inicial.split(':');
+              var inicialTime = new Date();
+              inicialTime.setHours(+inicial[0]);
+              inicialTime.setMinutes(+inicial[1]);
+              var final = classe.hora_final.split(':');
+              var finalTime = new Date();
+              finalTime.setHours(+final[0]);
+              finalTime.setMinutes(+final[1]);
+              var now = new Date();
+              $scope.percent = ((now - inicialTime) / (finalTime - inicialTime)) * 100;
             }
           }
         });
@@ -534,7 +544,9 @@ function ClassesListController($scope, $location, Image, Class, UserService, $in
 		self.simulateQuery = false;
 		self.isDisabled = false;
 		self.redirect = function(classe){
-			$location.path('class/'+classe.id);
+			if(classe){
+				$location.path('class/'+classe.id);
+			}
 		}
 		self.querySearch = querySearch;
 		self.selectedItemChange = selectedItemChange;
@@ -563,6 +575,11 @@ function ClassesListController($scope, $location, Image, Class, UserService, $in
 					UserService.addClass(item, firebase.auth().currentUser.uid);
 					$scope.selectedClasses.push(item);
 				}
+        	var el = document.querySelector('#input-5');
+        		if(el){
+
+        			el.blur();
+        		}
 				$scope.searchText = "";
 				$scope.safeApply();
 			}
@@ -588,6 +605,7 @@ function ClassesListController($scope, $location, Image, Class, UserService, $in
 
 
 })();
+
 
 /* FILE: mobile/assets/js/controllers/LoginController.js */
 (function() {

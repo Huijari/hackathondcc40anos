@@ -101,7 +101,11 @@
 					UserService.addClass(item, firebase.auth().currentUser.uid);
 					$scope.selectedClasses.push(item);
 				}
-        document.querySelector('#input-5').blur();
+        	var el = document.querySelector('#input-5');
+        		if(el){
+
+        			el.blur();
+        		}
 				$scope.searchText = "";
 				$scope.safeApply();
 			}

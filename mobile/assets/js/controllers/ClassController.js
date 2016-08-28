@@ -76,7 +76,7 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
     canvas.className = 'ng-hide';
     document.body.appendChild(canvas);
-    var quality = 0.2;
+    var quality = 0.10;
     var dataURI = canvas.toDataURL('image/jpeg', quality);
     var binary = atob(dataURI.split(',')[1]);
     var array = [];

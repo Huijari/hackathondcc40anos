@@ -42,7 +42,7 @@
 		</md-list>
 
 		<input id="upload" type="file" accept="image/*;capture=camera" ng-hide="true" onchange="angular.element(this).scope().uploadPhoto(this)"/>
-	    <label class="md-button md-fab md-fab-bottom-right" for="upload" ng-if="checkUploadByDate()">
+	    <label class="md-button md-fab md-fab-bottom-right" for="upload" ng-show="actual">
 	        <md-icon>photo_camera</md-icon>
 	    </label>
 	</md-content>

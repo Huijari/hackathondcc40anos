@@ -23,8 +23,20 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 		});
 	};
 
+	this.homeButtonClick = function(){
+		$location.path("/classesList");
+		$mdSidenav('left').toggle();
+	};
+
 	function buildLeftNavSettings () {
 		$scope.settings = [
+			{
+				settingName: "Início",
+				iconPath: "assets/images/icons/ic_home_black_24px.svg",
+				onClickMethod: self.homeButtonClick,
+				isCheckbox : false,
+				checked : true
+			},
 			{
 				settingName: "Visibilidade",
 				iconPath: "assets/images/icons/ic_visibility_black_24px.svg",

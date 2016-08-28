@@ -158,6 +158,7 @@ function ImageFactory() {
 	function UserService() {
 
 		var userClasses = [];
+		var user = {};
 
 		this.getUserClasses = function(userId) {
 			return firebase.database().ref("user/" + userId + "/classes");
@@ -176,6 +177,7 @@ function ImageFactory() {
 			});
 			firebase.database().ref('class/' + classId).update(userClass);
 		};
+
 	}
 
 })();
@@ -232,8 +234,16 @@ var app = angular.module('ClassPictures');
 app.controller('ClassesListController', ['$scope', '$location', ClassesListController]);
 
 function ClassesListController($scope, $location) {
-
-	$scope.addClassButtonLabel = "Editar disciplinas cadastradas";
+	
+	var setMessage = function(){
+		var message;
+		if($scope.classes.length === 0){
+			message = "Adicionar novas disciplinas";
+		} else {
+			message = "Editar disciplinas cadastradas";
+		}
+		$scope.addClassButtonLabel = message;
+	};
 
 	$scope.addNewClassClick = function(){
 		$location.path("/selectClasses");
@@ -289,6 +299,7 @@ function ClassesListController($scope, $location) {
 		];
 	}
 	buildSampleGroups();
+	setMessage();
 
 }
 
@@ -533,8 +544,20 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 		});
 	};
 
+	this.homeButtonClick = function(){
+		$location.path("/classesList");
+		$mdSidenav('left').toggle();
+	};
+
 	function buildLeftNavSettings () {
 		$scope.settings = [
+			{
+				settingName: "Início",
+				iconPath: "assets/images/icons/ic_home_black_24px.svg",
+				onClickMethod: self.homeButtonClick,
+				isCheckbox : false,
+				checked : true
+			},
 			{
 				settingName: "Visibilidade",
 				iconPath: "assets/images/icons/ic_visibility_black_24px.svg",

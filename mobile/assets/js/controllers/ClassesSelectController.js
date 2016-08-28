@@ -34,7 +34,9 @@
 						var classe = snapshot.val();
 						if (classe) {
 							classe.key = key;
-							$scope.selectedClasses.push(classe);
+							if(!findClasse(classe)){
+								$scope.selectedClasses.push(classe);
+							}
 						}
 						$scope.safeApply();
 					});
@@ -74,11 +76,15 @@
 			return results;
 		}
 
+		function findClasse(item) {
+			return $scope.selectedClasses.find(function(classe) {
+				return (classe.id == item.id);
+			});
+		}
+
 		function selectedItemChange(item) {
 			if (item) {
-				if (!$scope.selectedClasses.find(function(classe) {
-						return (classe.id == item.id);
-					})) {
+				if (!findClasse(item)) {
 					UserService.addClass(item, firebase.auth().currentUser.uid);
 					$scope.selectedClasses.push(item);
 				}

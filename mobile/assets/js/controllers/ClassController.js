@@ -5,6 +5,17 @@ var app = angular.module('ClassPictures');
 app.controller('ClassController', ['$scope', '$routeParams', '$location', 'Class', 'Image', ClassController]);
 
 function ClassController($scope, $routeParams, $location, Class, Image) {
+  $scope.safeApply = function(fn) {
+    var phase = this.$root.$$phase;
+    if(phase == '$apply' || phase == '$digest') {
+      if(fn && (typeof(fn) === 'function')) {
+        fn();
+      }
+    } else {
+      this.$apply(fn);
+    }
+  };
+
   $scope.class = {};
   Class.getById($routeParams.class).on('value', function(snapshot) {
     $scope.class = snapshot.val();
@@ -15,10 +26,10 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
         .getDownloadURL()
         .then(function(url) {
           image.url = url;
-          $scope.$apply();
+          $scope.safeApply();
         });
     });
-    $scope.$apply();
+    $scope.safeApply();
   });
   $scope.fileChanged = function(e) {
     var imageId = (new Date()).getTime()+'';

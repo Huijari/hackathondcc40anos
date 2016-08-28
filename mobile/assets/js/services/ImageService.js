@@ -12,11 +12,11 @@ function ImageFactory() {
   };
 
   service.getImage = function(classId, imageId) {
-    return service.getByClass(classId).child(imageId).getDownloadURL();
+    return service.getByClass(classId).child(imageId+'');
   };
 
   service.getImageMetadata = function(classId, imageId) {
-    return firebase.database().ref(classId+'/images/'+imageId-1);
+    return firebase.database().ref('class/'+classId+'/images/'+imageId);
   };
 
   return service;

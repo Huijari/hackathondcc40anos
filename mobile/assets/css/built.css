@@ -18,6 +18,11 @@
 	position: fixed !important;
 }
 
+img {
+  height: auto;
+  max-width: 100%;
+}
+
 #label-add-class {
 	font-weight: bold;
 	align-self: center;

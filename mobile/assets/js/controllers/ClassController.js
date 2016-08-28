@@ -9,14 +9,29 @@ function ClassController($scope, $routeParams, Class, Image) {
   Class.getById($routeParams.class).on('value', function(snapshot) {
     $scope.class = snapshot.val();
     $scope.class.images.forEach(function(image) {
-      Image.getByClass($routeParams.class).child(''+image.id)
-        .getDownloadURL().then(function(url) {
+      Image.getImage($routeParams.class, image.id)
+        .getDownloadURL()
+        .then(function(url) {
           image.url = url;
           $scope.$apply();
         });
     });
     $scope.$apply();
   });
-  console.log(Image.getByClass($routeParams.class));
+  $scope.fileChanged = function(e) {
+    var imageId = (new Date()).getTime()+'';
+    Image.getImage($routeParams.class, imageId)
+      .put(e.files[0])
+      .then(function(uploadTask) {
+        uploadTask.on('complete', function() {
+          Class.getById($routeParams.class).ref('images').push({
+            id: imageId,
+            owner: firebase.auth().currentUser.displayName,
+            description: '',
+            isPublic: false
+          });
+        });
+      });
+  };
 }
 })();

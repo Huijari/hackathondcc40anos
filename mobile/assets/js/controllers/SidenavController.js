@@ -19,10 +19,10 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 
 	this.logOut = function logOut(){
 		firebase.auth().signOut().then(function(){
-			$location.path(window.initialPath);
-			$scope.$apply();
+			$location.path("/");
 		});
 	};
+
 	this.chama = function() {
 		$location.path("/selectClasses");
 	};

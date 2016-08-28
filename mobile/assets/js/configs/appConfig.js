@@ -55,7 +55,7 @@ app.config(function($routeProvider, $locationProvider){
 app.run(function($location){
 	firebase.auth().getRedirectResult().then(function(result){
 		if (result.user) {
-			$location.path(window.location.pathname +'classesList');
+			$location.path('/classesList');
 		}
 	});
 });

@@ -57,7 +57,7 @@ app.config(function($routeProvider, $locationProvider){
 app.run(function($location){
 	firebase.auth().getRedirectResult().then(function(result){
 		if (result.user) {
-			$location.path(window.location.pathname +'classesList');
+			$location.path('/classesList');
 		}
 	});
 });
@@ -373,7 +373,7 @@ function ClassesListController($scope, $location) {
 						return ~angular.lowercase(classe[prop]).indexOf(word);
 					});
 					return b; 
-				});;
+				});
 				return a; 
 			};
 		}
@@ -455,10 +455,10 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 
 	this.logOut = function logOut(){
 		firebase.auth().signOut().then(function(){
-			$location.path(window.initialPath);
-			$scope.$apply();
+			$location.path("/");
 		});
 	};
+
 	this.chama = function() {
 		$location.path("/selectClasses");
 	};

@@ -21,18 +21,18 @@
 	</md-toolbar>
 	<md-content class="md-padding groups-container" layout="column">
 		<md-list flex>
-			<md-list-item class="md-3-line" ng-repeat="class in classes" ng-click="classesCtrl.openClass(class)" aria-label="{{ group.name }}">
+			<md-list-item class="md-3-line" ng-repeat="class in classes" ng-click="classesCtrl.openClass(class)" aria-label="{{ class.name }}">
 				<div class="md-list-item-text" layout="column">
 					<h3 ng-bind="class.nome_materia"></h3>
 					<h4 class="pp-subtitle" ng-bind="classesCtrl.groupCountMessage(class)"></h4>
 					<md-divider></md-divider>
-				  <md-progress-linear ng-show="{{shouldShow[class.id]}}" md-mode="determinate" value="{{percent}}">
+				  <md-progress-linear ng-show="{{shouldShow == class.id}}" md-mode="determinate" value="{{percent}}">
 
 				  </md-progress-linear>
 				</div>
 			</md-list-item>
 
-			<md-list-item class="md-3-line" ng-click="addNewClassClick()" aria-label="{{ group.name }}">
+			<md-list-item class="md-3-line" ng-click="addNewClassClick()" aria-label="{{ class.name }}">
 				<md-icon md-svg-icon="assets/images/icons/ic_border_color_black_24px.svg" class="md-primary md-hue-3"></md-icon>
 				<div class="md-list-item-text" layout="column">
 					<h3 id="label-add-class" ng-bind="addClassButtonLabel"></h3>

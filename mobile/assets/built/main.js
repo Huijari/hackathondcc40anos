@@ -366,11 +366,11 @@ $scope.checkUploadByDate = function() {
 						var dia_semana = (classe.dia_semana.indexOf('-') == -1) ? [classe.dia_semana] : classe.dia_semana.split('-');
 						dia_semana.forEach(function(dia) {
 							if (dias[dia] == moment().day() && moment({
-								hour: hora_inicial.split(':')[0],
-								minute: hora_inicial.split(':')[1]
+								hour: classe.hora_inicial.split(':')[0],
+								minute: classe.hora_inicial.split(':')[1]
 							}) <= moment() && moment() <= moment({
-								hour: hora_final.split(':')[0],
-								minute: hora_final.split(':')[1]
+								hour: classe.hora_final.split(':')[0],
+								minute: classe.hora_final.split(':')[1]
 							})) {
 								$scope.currentClass = classe.id;
 								return true;
@@ -572,42 +572,40 @@ setMessage();
 })();
 
 /* FILE: mobile/assets/js/controllers/LoginController.js */
-(function () {
+(function() {
 
-var app = angular.module('ClassPictures');
+	var app = angular.module('ClassPictures');
 
-app.controller('LoginController', ['$scope', '$location','Class', LoginController]);
+	app.controller('LoginController', ['$scope', '$location', 'Class', LoginController]);
 
-function LoginController($scope, $location, Class) {
-	
-	var user;
-	var isToLogin = true;
-	var userToken;
-	var self = this;
-	var provider = new firebase.auth.GoogleAuthProvider();
-	provider.addScope('https://www.googleapis.com/auth/plus.login');
+	function LoginController($scope, $location, Class) {
 
-	$scope.loginWithGoogleClick = function(){
-	    if (!firebase.auth().currentUser) {
-	      firebase.auth().signInWithRedirect(provider);
-	    } else {
-	      $location.path('/classesList');
-	    }
-	};
-	
-	Class.getAllClasses().then(function(requestData) {
+		var user;
+		var isToLogin = true;
+		var userToken;
+		var self = this;
+		var provider = new firebase.auth.GoogleAuthProvider();
+		provider.addScope('https://www.googleapis.com/auth/plus.login');
+
+		$scope.loginWithGoogleClick = function() {
+			if (!firebase.auth().currentUser) {
+				firebase.auth().signInWithRedirect(provider);
+			} else {
+				$location.path('/classesList');
+			}
+			$scope.$apply();
+		};
+		Class.getAllClasses().then(function(requestData) {
 			window.allClasses = requestData.data.records.map(function(each) {
 				each.id = each.codigo_materia + each.turma;
 				return each;
 			});
-	});
+		});
 
 
-}
+	}
 
 })();
-
-
 
 /* FILE: mobile/assets/js/controllers/PhotoController.js */
 (function () {

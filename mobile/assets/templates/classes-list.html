@@ -26,6 +26,9 @@
 					<h3 ng-bind="class.nome_materia"></h3>
 					<p> {{ class.codigo_materia + "   " +class.turma+"  "+class.dia_semana + "   " + class.hora_inicial+"-"+class.hora_final}} </p>
 					<md-divider></md-divider>
+				  <md-progress-linear ng-show="{{shouldShow[class.id]}}" md-mode="determinate" value="{{percent}}">
+
+				  </md-progress-linear>
 				</div>
 			</md-list-item>
 
@@ -38,11 +41,9 @@
 			<md-divider></md-divider>
 		</md-list>
 
-		<button id="add-class-buttom" ng-click="classesCtrl.addGroup()" class="md-fab md-fab-bottom-right md-button md-ink-ripple pp-fixed" type="button" aria-label="Add">
-			<md-icon md-svg-icon="assets/images/icons/ic_camera_alt_white_24px.svg"></md-icon>
-		</button>
-
+		<input id="upload" type="file" accept="image/*;capture=camera" ng-hide="true" onchange="angular.element(this).scope().uploadPhoto(this)"/>
+	    <label class="md-button md-fab md-fab-bottom-right" for="upload" ng-if="checkUploadByDate()">
+	        <md-icon>photo_camera</md-icon>
+	    </label>
 	</md-content>
-	
-
 </div>

@@ -20,6 +20,7 @@ function PhotoController($scope, $routeParams, Image, Class) {
     };
 
     var metaData = Image.getImageMetadata($routeParams.classId, $routeParams.imageId);
+    var storage = null;
 
     Class.getById($routeParams.classId).on('value', function(snapshot) {
         $scope.class = snapshot.val();
@@ -31,7 +32,8 @@ function PhotoController($scope, $routeParams, Image, Class) {
         $scope.image.date = new Date($scope.image.id).toLocaleString();
         $scope.image.title = $scope.image.owner.name + ': ' + $scope.image.date;
         $scope.safeApply();
-	    Image.getImage($routeParams.classId, $scope.image.id).getDownloadURL().then(function(URL) {
+	    storage = Image.getImage($routeParams.classId, $scope.image.id);
+        storage.getDownloadURL().then(function(URL) {
 	        $scope.image.path = URL;
             $scope.safeApply();
 	    }.bind(this));
@@ -47,6 +49,16 @@ function PhotoController($scope, $routeParams, Image, Class) {
 
     $scope.checkEdit = function() {
         return ($scope.image.owner)? $scope.image.owner.id !== firebase.auth().currentUser.uid : true;
+    };
+
+    $scope.delete = function () {
+        metaData.remove().then(function() {
+            storage.delete().catch(function(error) {
+                console.log("Image deletion failed: " + error.message)
+            });
+        }).catch(function(error) {
+            console.log("Metadata removal failed: " + error.message)
+        });
     };
 }
 })();

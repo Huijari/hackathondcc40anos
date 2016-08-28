@@ -80,3 +80,7 @@ img {
 .not-clickable {
 	pointer-events: none;
 }
+
+#label-nome {
+	width: 85% !important; 
+}

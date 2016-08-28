@@ -14,8 +14,8 @@
 
 <div ng-controller="ClassController as menuCtrl" layout-fill>
   <md-content class="md-padding groups-container" layout="column" flex>
-   <div ng-if="!class.images || class.images.length == 0">
-     Esta turma ainda não possui nenhuma foto :(
+   <div class='md-button' layout='column' flex layout-align='end center' layout-padding ng-if="!class.images || class.images.length == 0">
+     <p flex>Esta turma ainda não possui nenhuma foto</p>
    </div>
    <md-card ng-repeat="image in class.images" ng-click="gotoImage(image)">
       <img ng-src="{{image.url}}" class="md-card-image">
@@ -36,6 +36,6 @@
     ng-show="false"
     onchange="angular.element(this).scope().fileChanged(this)">
   <label class="md-button md-fab md-fab-bottom-right add-class-button" for="upload">
-    <md-icon class="not-clickable">photo_camera</md-icon>
+    <md-icon>photo_camera</md-icon>
   </label>
 </div>

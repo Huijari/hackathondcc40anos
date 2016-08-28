@@ -170,7 +170,11 @@ function ImageFactory() {
 		};
 
 		this.addClass = function(userClass, userId) {
-			firebase.database().ref('user/'+ userId + "/classes").push().set(userClass);
+			var classId = userClass.nome_materia + userClass.turma;
+			firebase.database().ref('user/'+ userId + "/classes").push().set({
+				id: classId
+			});
+			firebase.database().ref('class/' + classId).set(userClass);
 		};
 	}
 
@@ -298,7 +302,11 @@ function ClassesListController($scope, $location) {
 		var self = this;
 		$scope.allClasse = [];
 		ClassService.getAllClasses().then(function(requestData){
-			$scope.allClasses = requestData.data.records;
+			$scope.allClasses = requestData.data.records.map(function(each){
+				each.id = each.nome_materia + each.turma;
+				return each;
+			});
+
 		});
 		
 		$scope.selectedClasses = UserService.getUserClasses();

@@ -19,7 +19,11 @@
 		};
 
 		this.addClass = function(userClass, userId) {
-			firebase.database().ref('user/'+ userId + "/classes").push().set(userClass);
+			var classId = userClass.nome_materia + userClass.turma;
+			firebase.database().ref('user/'+ userId + "/classes").push().set({
+				id: classId
+			});
+			firebase.database().ref('class/' + classId).set(userClass);
 		};
 	}
 

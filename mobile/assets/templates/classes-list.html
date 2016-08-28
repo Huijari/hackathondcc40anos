@@ -26,9 +26,7 @@
 					<h3 ng-bind="class.nome_materia"></h3>
 					<p> {{ class.codigo_materia + "   " +class.turma+"  "+class.dia_semana + "   " + class.hora_inicial+"-"+class.hora_final}} </p>
 					<md-divider></md-divider>
-				  <md-progress-linear ng-show="{{shouldShow == class.id}}" md-mode="determinate" value="{{percent}}">
-
-				  </md-progress-linear>
+				  <md-progress-linear ng-show="{{actual.id == class.id}}" md-mode="determinate" value="{{percent}}"> </md-progress-linear>
 				</div>
 			</md-list-item>
 

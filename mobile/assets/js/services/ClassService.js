@@ -2,7 +2,7 @@
 
 var app = angular.module('ClassPictures');
 
-app.factory('ClassService', ['$http', ClassFactory]);
+app.factory('Class', ['$http', ClassFactory]);
 
 function ClassFactory($http) {
   var service = {};

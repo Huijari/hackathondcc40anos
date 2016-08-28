@@ -8,7 +8,8 @@ function ClassController($scope, $routeParams, Class, Image) {
   $scope.class = {};
   Class.getById($routeParams.class).on('value', function(snapshot) {
     $scope.class = snapshot.val();
-    $scope.class.images.forEach(function(image) {
+    Object.keys($scope.class.images).forEach(function(imageKey) {
+      var image = $scope.class.images[imageKey];
       Image.getImage($routeParams.class, image.id)
         .getDownloadURL()
         .then(function(url) {
@@ -21,20 +22,16 @@ function ClassController($scope, $routeParams, Class, Image) {
   $scope.fileChanged = function(e) {
     var imageId = (new Date()).getTime()+'';
     Image.getImage($routeParams.class, imageId)
-      .put(e.files[0])
-      .then(function(uploadTask) {
-        uploadTask.on('complete', function() {
-          Class.getById($routeParams.class).ref('images').push({
-            id: imageId,
-            owner: {
-              id: firebase.auth().currentUser.id,
-              name: firebase.auth().currentUser.displayName
-            },
-            description: '',
-            isPublic: true
-          });
-        });
-      });
+      .put(e.files[0]);
+    Class.getById($routeParams.class).child('images').push({
+      id: imageId,
+      owner: {
+        id: firebase.auth().currentUser.uid,
+        name: firebase.auth().currentUser.displayName
+      },
+      description: '',
+      isPublic: true
+    });
   };
 }
 })();

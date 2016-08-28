@@ -13,13 +13,24 @@
 </md-toolbar>
 
 <div ng-controller="ClassController as menuCtrl" layout-fill>
-  <md-content class="md-padding" layout layout-wrap>
-    <div ng-if="!class.images || class.images.length == 0">
-      Esta turma ainda não possui nenhuma image :(
-    </div>
-    <div flex="33" ng-repeat="image in class.images">
-      <img ng-src="{{image.url}}"/>
-    </div>
+  <md-content class="md-padding groups-container" layout="column" flex>
+   <div ng-if="!class.images || class.images.length == 0">
+     Esta turma ainda não possui nenhuma foto :(
+   </div>
+   <md-card ng-repeat="image in class.images" ng-click="gotoImage(image)">
+      <img ng-src="{{image.url}}" class="md-card-image" alt="Washed Out">
+      <md-card-actions layout="row" layout-align="end center">
+          <span>{{showDate(+image.id)}}</span>
+        <md-button class="md-icon-button" aria-label="Favorite">
+        </md-button>
+        <md-button class="md-icon-button" aria-label="Settings">
+          <md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
+        </md-button>
+        <md-button class="md-icon-button" aria-label="Share">
+          <md-icon md-svg-icon="img/icons/share-arrow.svg"></md-icon>
+        </md-button>
+      </md-card-actions>
+    </md-card>
   </md-content>
   <!-- <md-content class="md-padding groups-container" layout="column" flex> -->
   <!--   <md-grid-list md-cols="4" md-cols-sm="1" md-row-height="1:1"> -->
@@ -31,7 +42,7 @@
   <input id="upload" type="file" accept="image/*;capture=camera"
     ng-show="false"
     onchange="angular.element(this).scope().fileChanged(this)">
-  <label class="md-button md-fab md-fab-bottom-right" for="upload">
+  <label class="md-button md-fab md-fab-bottom-right add-class-button" for="upload">
     <md-icon>photo_camera</md-icon>
   </label>
 </div>

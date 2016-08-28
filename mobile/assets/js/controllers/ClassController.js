@@ -17,6 +17,9 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
   };
 
   $scope.class = {};
+  $scope.showDate = function(time){
+    return moment(time).format("DD/MM/YYYY hh:mm");
+  };
   Class.getById($routeParams.class).on('value', function(snapshot) {
     $scope.class = snapshot.val();
     Object.keys($scope.class.images || {}).forEach(function(imageKey) {

@@ -23,7 +23,7 @@
                 <span class="md-title" ng-bind="image.title"/>
               </md-card-title-text>
               <div layout="column" layout-align="space-around center">
-                  <md-switch id='ispublic' ng-model="image.isPublic" ng-disabled="checkEdit()" ng-true-value="'Público'" ng-false-value="'Privado'" ng-change="onChange('isPublic')" aria-label="Público">{{image.isPublic}}</md-switch>
+                  <md-switch id='ispublic' ng-model="image.isPublic" ng-disabled="checkEdit()" ng-change="onChange('isPublic')" aria-label="Público">{{((image.isPublic)? 'Público': 'Privado')}}</md-switch>
               </div>
             </md-card-actions>
             <md-card-content>

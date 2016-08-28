@@ -20,6 +20,9 @@
 #add-class-button {
 	position: fixed !important;
 }
+.add-class-button {
+	position: fixed !important;
+}
 
 img {
   height: auto;

@@ -164,13 +164,13 @@ function ImageFactory() {
 		};
 
 		this.removeClassById = function(classId, userId) {
-			return firebase.database().ref('user/' + userId + "/classes" + classId).remove().then(function() {
+			return firebase.database().ref('user/' + userId + "/classes/" + classId).remove().then(function() {
 				console.log("Remove succeeded.");
 			});
 		};
 
 		this.addClass = function(userClass, userId) {
-			var classId = userClass.nome_materia + userClass.turma;
+			var classId = userClass.codigo_materia + userClass.turma;
 			firebase.database().ref('user/'+ userId + "/classes").push().set({
 				id: classId
 			});
@@ -211,7 +211,7 @@ function ClassController($scope, $routeParams, Class, Image) {
             id: imageId,
             owner: firebase.auth().currentUser.displayName,
             description: '',
-            isPublic: false
+            isPublic: true
           });
         });
       });
@@ -296,34 +296,54 @@ function ClassesListController($scope, $location) {
 (function() {
 
 	var app = angular.module("ClassPictures");
-<<<<<<< HEAD
-	app.controller('ClassesSelectController', ['$scope', '$location', ClassesSelectController]);
 
-	function ClassesSelectController($scope, $location) {
-=======
-	app.controller('ClassesSelectController', ['$scope','UserService', 'ClassService', ClassesSelectController]);
+	app.controller('ClassesSelectController', ['$scope', 'UserService', 'ClassService', '$location', ClassesSelectController]);
 
-	function ClassesSelectController($scope, UserService, ClassService) {
->>>>>>> 814df22415792765a613b856989e226287a95365
+	function ClassesSelectController($scope, UserService, ClassService, $location) {
 		var self = this;
+		$scope.safeApply = function(fn) {
+			var phase = this.$root.$$phase;
+			if (phase == '$apply' || phase == '$digest') {
+				if (fn && (typeof(fn) === 'function')) {
+					fn();
+				}
+			} else {
+				this.$apply(fn);
+			}
+		};
 		$scope.allClasse = [];
-		ClassService.getAllClasses().then(function(requestData){
-			$scope.allClasses = requestData.data.records.map(function(each){
-				each.id = each.nome_materia + each.turma;
+		ClassService.getAllClasses().then(function(requestData) {
+			$scope.allClasses = requestData.data.records.map(function(each) {
+				each.id = each.codigo_materia + each.turma;
 				return each;
 			});
 
 		});
-		
-		$scope.selectedClasses = UserService.getUserClasses();
 
-			// "nome_materia": "PROBABILIDADE",
-			// "codigo_materia": "EST032",
-			// "turma": "TM2",
-			// "hora_inicial": "13:00",
-			// "hora_final": "14:40",
-			// "dia_semana": "Ter-Qui",
-			// "nome_sala": "1014"
+		UserService.getUserClasses(firebase.auth().currentUser.uid).on('value', function(snapshot) {
+			var classIds = snapshot.val();
+			$scope.selectedClasses = [];
+			if (classIds) {
+				Object.keys(classIds).forEach(function(key) {
+					ClassService.getById(classIds[key].id).on('value', function(snapshot) {
+						var classe = snapshot.val();
+						if (classe) {
+							classe.key = key;
+							$scope.selectedClasses.push(classe);
+						}
+						$scope.safeApply();
+					});
+				});
+			}
+		});
+
+		// "nome_materia": "PROBABILIDADE",
+		// "codigo_materia": "EST032",
+		// "turma": "TM2",
+		// "hora_inicial": "13:00",
+		// "hora_final": "14:40",
+		// "dia_semana": "Ter-Qui",
+		// "nome_sala": "1014"
 
 		self.backToClassesList = function() {
 			$location.path('/classesList');
@@ -337,9 +357,13 @@ function ClassesListController($scope, $location) {
 		self.querySearch = querySearch;
 		self.selectedItemChange = selectedItemChange;
 		self.removeSelection = function(classe) {
-			UserService.removeClassById(classe.codigo_materia + classe.turma, firebase.auth().currentUser);
-			$scope.selectedClasses.splice($scope.selectedClasses.indexOf(classe), 1);
+			UserService.removeClassById(classe.key, firebase.auth().currentUser.uid);
+			$scope.selectedClasses = $scope.selectedClasses.filter(function(each) {
+				return each.id != classe.id;
+			});
+			//$scope.selectedClasses.splice($scope.selectedClasses.indexOf(classe), 1);
 		};
+
 		function querySearch(query) {
 			var results = query ? $scope.allClasses.filter(createFilterFor(query)) : $scope.allClasses;
 			return results;
@@ -348,9 +372,9 @@ function ClassesListController($scope, $location) {
 		function selectedItemChange(item) {
 			if (item) {
 				if (!$scope.selectedClasses.find(function(classe) {
-						return (classe.codigo_materia == item.codigo_materia) && (classe.turma == item.turma);
+						return (classe.id == item.id);
 					})) {
-					UserService.addClass(item, firebase.auth().currentUser);
+					UserService.addClass(item, firebase.auth().currentUser.uid);
 					$scope.selectedClasses.push(item);
 				}
 			}
@@ -376,7 +400,6 @@ function ClassesListController($scope, $location) {
 
 
 })();
-
 
 /* FILE: mobile/assets/js/controllers/LoginController.js */
 (function () {

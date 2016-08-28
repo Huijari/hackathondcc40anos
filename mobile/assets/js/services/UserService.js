@@ -13,13 +13,13 @@
 		};
 
 		this.removeClassById = function(classId, userId) {
-			return firebase.database().ref('user/' + userId + "/classes" + classId).remove().then(function() {
+			return firebase.database().ref('user/' + userId + "/classes/" + classId).remove().then(function() {
 				console.log("Remove succeeded.");
 			});
 		};
 
 		this.addClass = function(userClass, userId) {
-			var classId = userClass.nome_materia + userClass.turma;
+			var classId = userClass.codigo_materia + userClass.turma;
 			firebase.database().ref('user/'+ userId + "/classes").push().set({
 				id: classId
 			});

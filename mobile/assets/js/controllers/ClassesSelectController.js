@@ -1,75 +1,25 @@
 (function() {
 
 	var app = angular.module("ClassPictures");
-	app.controller('ClassesSelectController', ['$scope', '$location', ClassesSelectController]);
 
-	function ClassesSelectController($scope, $location) {
+	app.controller('ClassesSelectController', ['$scope','UserService', 'ClassService', '$location', ClassesSelectController]);
+
+	function ClassesSelectController($scope, UserService, ClassService, $location) {
 		var self = this;
-		$scope.allClasses = [{
-			"nome_materia": "PROBABILIDADE",
-			"codigo_materia": "EST032",
-			"turma": "TM2",
-			"hora_inicial": "13:00",
-			"hora_final": "14:40",
-			"dia_semana": "Ter-Qui",
-			"nome_sala": "1014"
-		}, {
-			"nome_materia": "ESTATISTICA E PROBABILIDADES",
-			"codigo_materia": "EST031",
-			"turma": "TB1",
-			"hora_inicial": "09:25",
-			"hora_final": "11:05",
-			"dia_semana": "Ter-Qui",
-			"nome_sala": "1015"
-		}, {
-			"nome_materia": "ESTATISTICA E PROBABILIDADES",
-			"codigo_materia": "EST031",
-			"turma": "TE",
-			"hora_inicial": "19:00",
-			"hora_final": "20:40",
-			"dia_semana": "Ter",
-			"nome_sala": "1015"
-		}, {
-			"nome_materia": "ESTATISTICA E PROBABILIDADES",
-			"codigo_materia": "EST031",
-			"turma": "TE",
-			"hora_inicial": "20:55",
-			"hora_final": "22:35",
-			"dia_semana": "Qui",
-			"nome_sala": "1015"
-		}, {
-			"nome_materia": "ESTATISTICA E PROBABILIDADES",
-			"codigo_materia": "EST031",
-			"turma": "TW",
-			"hora_inicial": "19:00",
-			"hora_final": "20:40",
-			"dia_semana": "Seg-Qua",
-			"nome_sala": "1015"
-		}, {
-			"nome_materia": "PROBABILIDADE",
-			"codigo_materia": "EST032",
-			"turma": "TE",
-			"hora_inicial": "20:55",
-			"hora_final": "22:35",
-			"dia_semana": "Ter",
-			"nome_sala": "1015"
-		}, {
-			"nome_materia": "PROBABILIDADE",
-			"codigo_materia": "EST032",
-			"turma": "TE",
-			"hora_inicial": "19:00",
-			"hora_final": "20:40",
-			"dia_semana": "Qui",
-			"nome_sala": "1015"
-		}, {
-			"nome_materia": "PROBABILIDADE",
-			"codigo_materia": "EST032",
-			"turma": "TM1",
-			"hora_inicial": "13:00",
-			"hora_final": "14:40",
-			"dia_semana": "Ter-Qui",
-			"nome_sala": "1015"
-		}];
+		$scope.allClasse = [];
+		ClassService.getAllClasses().then(function(requestData){
+			$scope.allClasses = requestData.data.records;
+		});
+		
+		$scope.selectedClasses = UserService.getUserClasses();
+
+			// "nome_materia": "PROBABILIDADE",
+			// "codigo_materia": "EST032",
+			// "turma": "TM2",
+			// "hora_inicial": "13:00",
+			// "hora_final": "14:40",
+			// "dia_semana": "Ter-Qui",
+			// "nome_sala": "1014"
 
 		self.backToClassesList = function() {
 			$location.path('/classesList');
@@ -82,10 +32,10 @@
 
 		self.querySearch = querySearch;
 		self.selectedItemChange = selectedItemChange;
-		self.removeSelection = function(classe){
-			$scope.selectedClasses.splice($scope.selectedClasses.indexOf(classe),1);
+		self.removeSelection = function(classe) {
+			UserService.removeClassById(classe.codigo_materia + classe.turma, firebase.auth().currentUser);
+			$scope.selectedClasses.splice($scope.selectedClasses.indexOf(classe), 1);
 		};
-		
 		function querySearch(query) {
 			var results = query ? $scope.allClasses.filter(createFilterFor(query)) : $scope.allClasses;
 			return results;
@@ -93,9 +43,10 @@
 
 		function selectedItemChange(item) {
 			if (item) {
-				if (! $scope.selectedClasses.find(function(classe) {
+				if (!$scope.selectedClasses.find(function(classe) {
 						return (classe.codigo_materia == item.codigo_materia) && (classe.turma == item.turma);
 					})) {
+					UserService.addClass(item, firebase.auth().currentUser);
 					$scope.selectedClasses.push(item);
 				}
 			}
@@ -112,9 +63,9 @@
 					var b = Object.keys(classe).some(function(prop) {
 						return ~angular.lowercase(classe[prop]).indexOf(word);
 					});
-					return b; 
+					return b;
 				});
-				return a; 
+				return a;
 			};
 		}
 	}

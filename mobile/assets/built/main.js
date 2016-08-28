@@ -104,11 +104,14 @@ app.directive('classesSelect', function() {
 
 var app = angular.module('ClassPictures');
 
-app.factory('Class', [ClassFactory]);
+app.factory('ClassService', ['$http', ClassFactory]);
 
-function ClassFactory() {
+function ClassFactory($http) {
   var service = {};
-
+  service.getAllClasses = function(){
+  	return $http.get("https://crossorigin.me/http://www.icex.ufmg.br/minhasala/recupera_salas.php");
+  };
+  
   service.getById = function(id) {
     return firebase.database().ref('class/' + id);
   };
@@ -146,24 +149,30 @@ function ImageFactory() {
 
 
 /* FILE: mobile/assets/js/services/UserService.js */
-(function () {
+(function() {
 
-var app = angular.module('ClassPictures');
+	var app = angular.module('ClassPictures');
 
-app.service('UserService', [UserService]);
+	app.service('UserService', [UserService]);
 
-function UserService() {
+	function UserService() {
 
-	var userClasses = [];
+		var userClasses = [];
 
-	this.getUserClasses = function(){
-		return userClasses; 
-	};
+		this.getUserClasses = function(userId) {
+			return firebase.database().ref("user/" + userId + "/classes");
+		};
 
-	this.addUserClass = function(userClass){
-		userClasses.concat(userClass);
-	};
-}
+		this.removeClassById = function(classId, userId) {
+			return firebase.database().ref('user/' + userId + "/classes" + classId).remove().then(function() {
+				console.log("Remove succeeded.");
+			});
+		};
+
+		this.addClass = function(userClass, userId) {
+			firebase.database().ref('user/'+ userId + "/classes").push().set(userClass);
+		};
+	}
 
 })();
 
@@ -233,10 +242,9 @@ function ClassesListController($scope, $location) {
 	};
 
 	this.openGroup = function openGroup(group){
-		$location.path('/group');
-		GroupService.setOpenedGroup(group);
+    $location.path(window.location.pathname + 'class/' + group.id);
 	};
-	
+
 	function buildSampleGroups() {
 		$scope.classes = [
 			{
@@ -284,75 +292,30 @@ function ClassesListController($scope, $location) {
 (function() {
 
 	var app = angular.module("ClassPictures");
+<<<<<<< HEAD
 	app.controller('ClassesSelectController', ['$scope', '$location', ClassesSelectController]);
 
 	function ClassesSelectController($scope, $location) {
+=======
+	app.controller('ClassesSelectController', ['$scope','UserService', 'ClassService', ClassesSelectController]);
+
+	function ClassesSelectController($scope, UserService, ClassService) {
+>>>>>>> 814df22415792765a613b856989e226287a95365
 		var self = this;
-		$scope.allClasses = [{
-			"nome_materia": "PROBABILIDADE",
-			"codigo_materia": "EST032",
-			"turma": "TM2",
-			"hora_inicial": "13:00",
-			"hora_final": "14:40",
-			"dia_semana": "Ter-Qui",
-			"nome_sala": "1014"
-		}, {
-			"nome_materia": "ESTATISTICA E PROBABILIDADES",
-			"codigo_materia": "EST031",
-			"turma": "TB1",
-			"hora_inicial": "09:25",
-			"hora_final": "11:05",
-			"dia_semana": "Ter-Qui",
-			"nome_sala": "1015"
-		}, {
-			"nome_materia": "ESTATISTICA E PROBABILIDADES",
-			"codigo_materia": "EST031",
-			"turma": "TE",
-			"hora_inicial": "19:00",
-			"hora_final": "20:40",
-			"dia_semana": "Ter",
-			"nome_sala": "1015"
-		}, {
-			"nome_materia": "ESTATISTICA E PROBABILIDADES",
-			"codigo_materia": "EST031",
-			"turma": "TE",
-			"hora_inicial": "20:55",
-			"hora_final": "22:35",
-			"dia_semana": "Qui",
-			"nome_sala": "1015"
-		}, {
-			"nome_materia": "ESTATISTICA E PROBABILIDADES",
-			"codigo_materia": "EST031",
-			"turma": "TW",
-			"hora_inicial": "19:00",
-			"hora_final": "20:40",
-			"dia_semana": "Seg-Qua",
-			"nome_sala": "1015"
-		}, {
-			"nome_materia": "PROBABILIDADE",
-			"codigo_materia": "EST032",
-			"turma": "TE",
-			"hora_inicial": "20:55",
-			"hora_final": "22:35",
-			"dia_semana": "Ter",
-			"nome_sala": "1015"
-		}, {
-			"nome_materia": "PROBABILIDADE",
-			"codigo_materia": "EST032",
-			"turma": "TE",
-			"hora_inicial": "19:00",
-			"hora_final": "20:40",
-			"dia_semana": "Qui",
-			"nome_sala": "1015"
-		}, {
-			"nome_materia": "PROBABILIDADE",
-			"codigo_materia": "EST032",
-			"turma": "TM1",
-			"hora_inicial": "13:00",
-			"hora_final": "14:40",
-			"dia_semana": "Ter-Qui",
-			"nome_sala": "1015"
-		}];
+		$scope.allClasse = [];
+		ClassService.getAllClasses().then(function(requestData){
+			$scope.allClasses = requestData.data.records;
+		});
+		
+		$scope.selectedClasses = UserService.getUserClasses();
+
+			// "nome_materia": "PROBABILIDADE",
+			// "codigo_materia": "EST032",
+			// "turma": "TM2",
+			// "hora_inicial": "13:00",
+			// "hora_final": "14:40",
+			// "dia_semana": "Ter-Qui",
+			// "nome_sala": "1014"
 
 		self.backToClassesList = function() {
 			$location.path('/classesList');
@@ -365,10 +328,10 @@ function ClassesListController($scope, $location) {
 
 		self.querySearch = querySearch;
 		self.selectedItemChange = selectedItemChange;
-		self.removeSelection = function(classe){
-			$scope.selectedClasses.splice($scope.selectedClasses.indexOf(classe),1);
+		self.removeSelection = function(classe) {
+			UserService.removeClassById(classe.codigo_materia + classe.turma, firebase.auth().currentUser);
+			$scope.selectedClasses.splice($scope.selectedClasses.indexOf(classe), 1);
 		};
-		
 		function querySearch(query) {
 			var results = query ? $scope.allClasses.filter(createFilterFor(query)) : $scope.allClasses;
 			return results;
@@ -376,9 +339,10 @@ function ClassesListController($scope, $location) {
 
 		function selectedItemChange(item) {
 			if (item) {
-				if (! $scope.selectedClasses.find(function(classe) {
+				if (!$scope.selectedClasses.find(function(classe) {
 						return (classe.codigo_materia == item.codigo_materia) && (classe.turma == item.turma);
 					})) {
+					UserService.addClass(item, firebase.auth().currentUser);
 					$scope.selectedClasses.push(item);
 				}
 			}
@@ -395,9 +359,9 @@ function ClassesListController($scope, $location) {
 					var b = Object.keys(classe).some(function(prop) {
 						return ~angular.lowercase(classe[prop]).indexOf(word);
 					});
-					return b; 
+					return b;
 				});
-				return a; 
+				return a;
 			};
 		}
 	}

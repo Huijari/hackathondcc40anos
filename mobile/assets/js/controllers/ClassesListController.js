@@ -30,6 +30,16 @@ function ClassesListController($scope, $location, Image, Class, UserService, $in
           if (classe) {
             if (checkDay(classe) && checkHoraInicial(classe) && checkHoraFinal(classe)) {
               $scope.actual = classe;
+              var inicial = classe.hora_inicial.split(':');
+              var inicialTime = new Date();
+              inicialTime.setHours(+inicial[0]);
+              inicialTime.setMinutes(+inicial[1]);
+              var final = classe.hora_final.split(':');
+              var finalTime = new Date();
+              finalTime.setHours(+final[0]);
+              finalTime.setMinutes(+final[1]);
+              var now = new Date();
+              $scope.percent = ((now - inicialTime) / (finalTime - inicialTime)) * 100;
             }
           }
         });

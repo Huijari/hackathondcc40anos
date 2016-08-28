@@ -17,3 +17,8 @@
 #add-class-buttom {
 	position: fixed !important;
 }
+
+img {
+  height: auto;
+  max-width: 100%;
+}

@@ -105,7 +105,7 @@
 						return ~angular.lowercase(classe[prop]).indexOf(word);
 					});
 					return b; 
-				});;
+				});
 				return a; 
 			};
 		}

@@ -21,14 +21,22 @@
 	</md-toolbar>
 	<md-content class="md-padding groups-container" layout="column">
 		<md-list flex>
-			<md-list-item class="md-3-line" ng-repeat="group in groups" ng-click="classesCtrl.openGroup(group)" aria-label="{{ group.name }}">
-				<img ng-src="{{group.imagePath}}" class="md-avatar" alt="{{igroup.name}}" />
+			<md-list-item class="md-3-line" ng-repeat="class in classes" ng-click="classesCtrl.openGroup(group)" aria-label="{{ group.name }}">
+				<img ng-src="{{class.imagePath}}" class="md-avatar" alt="{{igroup.name}}" />
 				<div class="md-list-item-text" layout="column">
-					<h3 ng-bind="group.name"></h3>
-					<h4 class="pp-subtitle" ng-bind="classesCtrl.groupCountMessage(group)"></h4>
+					<h3 ng-bind="class.name"></h3>
+					<h4 class="pp-subtitle" ng-bind="classesCtrl.groupCountMessage(class)"></h4>
 					<md-divider></md-divider>
 				</div>
 			</md-list-item>
+
+			<md-list-item class="md-3-line" ng-click="addNewClassClick()" aria-label="{{ group.name }}">
+				<md-icon md-svg-icon="assets/images/icons/ic_border_color_black_24px.svg" class="md-primary md-hue-3"></md-icon>
+				<div class="md-list-item-text" layout="column">
+					<h3 id="label-add-class" ng-bind="addClassButtonLabel"></h3>
+				</div>
+			</md-list-item>
+			<md-divider></md-divider>
 		</md-list>
 
 		<button id="add-class-buttom" ng-click="classesCtrl.addGroup()" class="md-fab md-fab-bottom-right md-button md-ink-ripple pp-fixed" type="button" aria-label="Add">

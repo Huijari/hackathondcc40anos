@@ -49,7 +49,7 @@
 			return a.filter(function(item) {
 				var k = item.id;
 				return seen.hasOwnProperty(k) ? false : (seen[k] = true);
-			})
+			});
 		}
 
 		$scope.$watch(function() {

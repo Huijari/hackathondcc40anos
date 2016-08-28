@@ -238,85 +238,86 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
 
 
 /* FILE: mobile/assets/js/controllers/ClassesListController.js */
-(function () {
+(function() {
 
-var app = angular.module('ClassPictures');
+	var app = angular.module('ClassPictures');
 
-app.controller('ClassesListController', ['$scope', '$location', ClassesListController]);
+	app.controller('ClassesListController', ['$scope', 'UserService', 'Class', '$location', ClassesListController]);
 
-function ClassesListController($scope, $location) {
-	
-	var setMessage = function(){
-		var message;
-		if($scope.classes.length === 0){
-			message = "Adicionar novas disciplinas";
-		} else {
-			message = "Editar disciplinas cadastradas";
-		}
-		$scope.addClassButtonLabel = message;
-	};
-
-	$scope.addNewClassClick = function(){
-		$location.path("/selectClasses");
-	};
-
-	this.countMemberClass = function countMemberClass(group) {
-		var groupCount = group.members? group.members.length : 0;
-		var message = groupCount + (groupCount > 1 ? ' members' : ' member');
-		return message;
-	};
-
-	this.addClasses = function addClasses() {
-		$location.path('/createGroup');
-	};
-
-	this.openClass = function openClass(group){
-    	$location.path('class/' + group.id);
-	};
-
-	function buildSampleGroups() {
-		$scope.classes = [
-			{
-				id: 'EST032TM2',
-				name: 'Calculo Diferencial Integral III',
-				imagePath: 'https://unsplash.it/80/80/'
-			},
-			{
-				id: 2,
-				name: 'Fundamentos de Mecânia dos sólidos e Fluidos',
-				imagePath: 'https://unsplash.it/70/70/'
-			},
-			{
-				id: 3,
-				name: 'Equaçoes Diferencias A',
-				lastPosition: 'Favelinha loka',
-				members: [1, 2],
-				imagePath: 'https://unsplash.it/90/90/'
-			},
-			{
-				id: 5,
-				name: 'Análise de circuitos elétricos II',
-				lastPosition: 'Teknisa Service',
-				members: [1, 2],
-				imagePath: 'assets/images/icons/ic_view_headline_white_24px.svg'
-			},
-			{
-				id: 4,
-				name: 'Laboratório de Sistemas Digitais',
-				lastPosition: 'There is no last position to show',
-				members: [1, 2],
-				imagePath: 'https://unsplash.it/100/100/'
+	function ClassesListController($scope, UserService, Class, $location) {
+		var self = this;
+		$scope.classes = [];
+		$scope.safeApply = function(fn) {
+			var phase = this.$root.$$phase;
+			if (phase == '$apply' || phase == '$digest') {
+				if (fn && (typeof(fn) === 'function')) {
+					fn();
+				}
+			} else {
+				this.$apply(fn);
 			}
-		];
-	}
-	buildSampleGroups();
-	setMessage();
+		};
 
-}
+		function findClasse(item) {
+			return $scope.classes.find(function(classe) {
+				return (classe.id == item.id);
+			});
+		}
+		var setMessage = function() {
+			var message;
+			if ($scope.classes.length === 0) {
+				message = "Adicionar novas disciplinas";
+			} else {
+				message = "Editar disciplinas cadastradas";
+			}
+			$scope.addClassButtonLabel = message;
+		};
+
+		$scope.addNewClassClick = function() {
+			$location.path("/selectClasses");
+		};
+
+		this.countMemberClass = function countMemberClass(group) {
+			var groupCount = group.members ? group.members.length : 0;
+			var message = groupCount + (groupCount > 1 ? ' members' : ' member');
+			return message;
+		};
+
+		this.addClasses = function addClasses() {
+			$location.path('/createGroup');
+		};
+
+		this.openClass = function openClass(group) {
+			$location.path('class/' + group.id);
+		};
+
+
+		function buildSampleGroups() {
+			UserService.getUserClasses(firebase.auth().currentUser.uid).on('value', function(snapshot) {
+				var classIds = snapshot.val();
+				$scope.classes = [];
+				if (classIds) {
+					Object.keys(classIds).forEach(function(key) {
+						Class.getById(classIds[key].id).on('value', function(snapshot) {
+							var classe = snapshot.val();
+							if (classe) {
+								classe.key = key;
+								if (!findClasse(classe)) {
+									$scope.classes.push(classe);
+								}
+							}
+							$scope.safeApply();
+						});
+					});
+				}
+			});
+		}
+		buildSampleGroups();
+		setMessage();
+
+	}
 
 })();
-
-
 
 /* FILE: mobile/assets/js/controllers/ClassesSelectController.js */
 (function() {
@@ -370,7 +371,7 @@ function ClassesListController($scope, $location) {
 			return a.filter(function(item) {
 				var k = item.id;
 				return seen.hasOwnProperty(k) ? false : (seen[k] = true);
-			})
+			});
 		}
 
 		$scope.$watch(function() {

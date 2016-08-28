@@ -2,9 +2,9 @@
 
 var app = angular.module('ClassPictures');
 
-app.controller('PhotoController', ['$scope', '$routeParams', 'Image', 'Class', PhotoController]);
+app.controller('PhotoController', ['$scope', '$location', '$routeParams', 'Image', 'Class', PhotoController]);
 
-function PhotoController($scope, $routeParams, Image, Class) {
+function PhotoController($scope, $location, $routeParams, Image, Class) {
     $scope.image = {};
 
     //FOR NARNIA
@@ -29,7 +29,7 @@ function PhotoController($scope, $routeParams, Image, Class) {
 
     metaData.on('value', function(snapshot) {
         $scope.image = snapshot.val();
-        $scope.image.date = new Date($scope.image.id).toLocaleString();
+        $scope.image.date = new Date(+$scope.image.id).toLocaleString();
         $scope.image.title = $scope.image.owner.name + ': ' + $scope.image.date;
         $scope.safeApply();
 	    storage = Image.getImage($routeParams.classId, $scope.image.id);
@@ -37,7 +37,6 @@ function PhotoController($scope, $routeParams, Image, Class) {
 	        $scope.image.path = URL;
             $scope.safeApply();
 	    }.bind(this));
-
     });
 
     $scope.onChange = function(key) {
@@ -53,7 +52,10 @@ function PhotoController($scope, $routeParams, Image, Class) {
 
     $scope.delete = function () {
         metaData.remove().then(function() {
-            storage.delete().catch(function(error) {
+            storage.delete().then(function() {
+                $location.path('class/' + $routeParams.classId);
+                $scope.safeApply();
+            }).catch(function(error) {
                 console.log("Image deletion failed: " + error.message);
             });
         }).catch(function(error) {

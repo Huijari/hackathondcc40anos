@@ -218,21 +218,56 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
   });
   $scope.fileChanged = function(e) {
     var imageId = (new Date()).getTime()+'';
-    Image.getImage($routeParams.class, imageId)
-      .put(e.files[0]);
-    Class.getById($routeParams.class).child('images').push({
-      id: imageId,
-      owner: {
-        id: firebase.auth().currentUser.uid,
-        name: firebase.auth().currentUser.displayName
-      },
-      description: '',
-      isPublic: true
-    });
+    processfile(e.files[0], imageId);
   };
   $scope.gotoImage = function(image) {
     $location.path('photo/' + $routeParams.class + '/' + image.key);
   };
+
+  function processfile(file, imageId) {
+    var reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+    reader.onload = function(event) {
+      var blob = new Blob([event.target.result]);
+      var blobURL = URL.createObjectURL(blob);
+      var image = document.createElement('img');
+      image.src = blobURL;
+      image.onload = function() {
+        Image.getImage($routeParams.class, imageId)
+          .put(resize(image))
+          .then(function(snapshot) {
+            Class.getById($routeParams.class).child('images').push({
+              id: imageId,
+              owner: {
+                id: firebase.auth().currentUser.uid,
+                name: firebase.auth().currentUser.displayName
+              },
+              description: '',
+              isPublic: true
+            });
+          });
+      };
+    };
+  }
+
+  function resize(image) {
+    var canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    var context = canvas.getContext('2d');
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    canvas.className = 'ng-hide';
+    document.body.appendChild(canvas);
+    var quality = 0.2;
+    var dataURI = canvas.toDataURL('image/jpeg', quality);
+    var binary = atob(dataURI.split(',')[1]);
+    var array = [];
+    for (var i = 0; i < binary.length; i++)
+      array.push(binary.charCodeAt(i));
+    return new Blob([new Uint8Array(array)], {
+      type: 'image/jpeg'
+    });
+  }
 }
 })();
 
@@ -242,11 +277,13 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
 
 	var app = angular.module('ClassPictures');
 
-	app.controller('ClassesListController', ['$scope', 'UserService', 'Class', '$location', ClassesListController]);
+	app.controller('ClassesListController', ['$scope', 'UserService', 'Class', '$location','$interval', ClassesListController]);
 
-	function ClassesListController($scope, UserService, Class, $location) {
+	function ClassesListController($scope, UserService, Class, $location, $intervaç) {
+		moment.updateLocale("pt-br");
 		var self = this;
 		$scope.classes = [];
+		$scope.shouldShow = {};
 		$scope.safeApply = function(fn) {
 			if ($scope.$root && !$scope.$root.$$phase) {
 			var phase = this.$root.$$phase;
@@ -259,6 +296,28 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
 			}
 		}
 		};
+		$scope.percent;
+		var stop = $interval(function(){
+			$scope.classes.forEach(function(classe){
+				var now = moment(new Date();
+				//var today = now.format("dddd").toLowerCase();
+				//var dias = classe.dia_semana.toLowerCase().split('-');
+				var inicial = classe.hora_inicial.substring(0,2) * 60 + parseInt(classe.hora_inicial.substring(3,5),10);
+				var final = classe.hora_final.substring(0,2)) * 60 + parseInt(classe.hora_final.substring(3,5),10);
+				var hNow = now.getHours() * 60 + now.getMinutes();
+				var diff = final - inicial;
+				if(hNow <= final && hNow >= inicial){
+					$scope.percent = hNow/diff *100;
+				}
+				//if(){
+				//	if()$scope.shouldShow[classe]= should;
+				//}
+			});
+		},500);
+
+		$scope.on('$destroy', function() {
+			$interval.cancel(stop);
+		});
 
 		function findClasse(item) {
 			return $scope.classes.find(function(classe) {

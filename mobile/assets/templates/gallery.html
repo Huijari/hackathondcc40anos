@@ -13,13 +13,21 @@
 </md-toolbar>
 
 <div ng-controller="ClassController as menuCtrl" layout-fill>
-  <md-content class="md-padding groups-container" layout="column" flex>
-    <md-grid-list md-cols="4" md-row-height="1:1">
-      <md-grid-tile md-ink-ripple="#fff" ng-repeat="image in class.images" ng-click="gotoImage(image)">
-        <img ng-src="{{image.url}}"/>
-      </md-grid-tile>
-    </md-grid-list>
+  <md-content class="md-padding" layout layout-wrap>
+    <div ng-if="!class.images || class.images.length == 0">
+      Esta turma ainda não possui nenhuma image :(
+    </div>
+    <div flex="33" ng-repeat="image in class.images">
+      <img ng-src="{{image.url}}"/>
+    </div>
   </md-content>
+  <!-- <md-content class="md-padding groups-container" layout="column" flex> -->
+  <!--   <md-grid-list md-cols="4" md-cols-sm="1" md-row-height="1:1"> -->
+  <!--     <md-grid-tile md-ink-ripple="#fff" ng-repeat="image in class.images" ng-click="gotoImage(image)"> -->
+  <!--       <img ng-src="{{image.url}}"/> -->
+  <!--     </md-grid-tile> -->
+  <!--   </md-grid-list> -->
+  <!-- </md-content> -->
   <input id="upload" type="file" accept="image/*;capture=camera"
     ng-show="false"
     onchange="angular.element(this).scope().fileChanged(this)">

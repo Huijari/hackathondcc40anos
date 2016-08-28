@@ -19,7 +19,7 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
   $scope.class = {};
   Class.getById($routeParams.class).on('value', function(snapshot) {
     $scope.class = snapshot.val();
-    Object.keys($scope.class.images).forEach(function(imageKey) {
+    Object.keys($scope.class.images || {}).forEach(function(imageKey) {
       var image = $scope.class.images[imageKey];
       image.key = imageKey;
       Image.getImage($routeParams.class, image.id)

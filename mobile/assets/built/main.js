@@ -104,7 +104,7 @@ app.directive('classesSelect', function() {
 
 var app = angular.module('ClassPictures');
 
-app.factory('ClassService', ['$http', ClassFactory]);
+app.factory('Class', ['$http', ClassFactory]);
 
 function ClassFactory($http) {
   var service = {};
@@ -191,7 +191,8 @@ function ClassController($scope, $routeParams, Class, Image) {
   $scope.class = {};
   Class.getById($routeParams.class).on('value', function(snapshot) {
     $scope.class = snapshot.val();
-    $scope.class.images.forEach(function(image) {
+    Object.keys($scope.class.images).forEach(function(imageKey) {
+      var image = $scope.class.images[imageKey];
       Image.getImage($routeParams.class, image.id)
         .getDownloadURL()
         .then(function(url) {
@@ -204,20 +205,16 @@ function ClassController($scope, $routeParams, Class, Image) {
   $scope.fileChanged = function(e) {
     var imageId = (new Date()).getTime()+'';
     Image.getImage($routeParams.class, imageId)
-      .put(e.files[0])
-      .then(function(uploadTask) {
-        uploadTask.on('complete', function() {
-          Class.getById($routeParams.class).ref('images').push({
-            id: imageId,
-            owner: {
-              id: firebase.auth().currentUser.id,
-              name: firebase.auth().currentUser.displayName
-            },
-            description: '',
-            isPublic: true
-          });
-        });
-      });
+      .put(e.files[0]);
+    Class.getById($routeParams.class).child('images').push({
+      id: imageId,
+      owner: {
+        id: firebase.auth().currentUser.uid,
+        name: firebase.auth().currentUser.displayName
+      },
+      description: '',
+      isPublic: true
+    });
   };
 }
 })();
@@ -300,9 +297,9 @@ function ClassesListController($scope, $location) {
 
 	var app = angular.module("ClassPictures");
 
-	app.controller('ClassesSelectController', ['$scope', 'UserService', 'ClassService', '$location', ClassesSelectController]);
+	app.controller('ClassesSelectController', ['$scope', 'UserService', 'Class', '$location', ClassesSelectController]);
 
-	function ClassesSelectController($scope, UserService, ClassService, $location) {
+	function ClassesSelectController($scope, UserService, Class, $location) {
 		var self = this;
 		$scope.safeApply = function(fn) {
 			var phase = this.$root.$$phase;
@@ -315,7 +312,7 @@ function ClassesListController($scope, $location) {
 			}
 		};
 		$scope.allClasse = [];
-		ClassService.getAllClasses().then(function(requestData) {
+		Class.getAllClasses().then(function(requestData) {
 			$scope.allClasses = requestData.data.records.map(function(each) {
 				each.id = each.codigo_materia + each.turma;
 				return each;
@@ -328,7 +325,7 @@ function ClassesListController($scope, $location) {
 			$scope.selectedClasses = [];
 			if (classIds) {
 				Object.keys(classIds).forEach(function(key) {
-					ClassService.getById(classIds[key].id).on('value', function(snapshot) {
+					Class.getById(classIds[key].id).on('value', function(snapshot) {
 						var classe = snapshot.val();
 						if (classe) {
 							classe.key = key;

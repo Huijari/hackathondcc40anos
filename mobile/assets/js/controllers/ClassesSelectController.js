@@ -2,9 +2,9 @@
 
 	var app = angular.module("ClassPictures");
 
-	app.controller('ClassesSelectController', ['$scope', 'UserService', 'ClassService', '$location', ClassesSelectController]);
+	app.controller('ClassesSelectController', ['$scope', 'UserService', 'Class', '$location', ClassesSelectController]);
 
-	function ClassesSelectController($scope, UserService, ClassService, $location) {
+	function ClassesSelectController($scope, UserService, Class, $location) {
 		var self = this;
 		$scope.safeApply = function(fn) {
 			var phase = this.$root.$$phase;
@@ -17,7 +17,7 @@
 			}
 		};
 		$scope.allClasse = [];
-		ClassService.getAllClasses().then(function(requestData) {
+		Class.getAllClasses().then(function(requestData) {
 			$scope.allClasses = requestData.data.records.map(function(each) {
 				each.id = each.codigo_materia + each.turma;
 				return each;
@@ -30,7 +30,7 @@
 			$scope.selectedClasses = [];
 			if (classIds) {
 				Object.keys(classIds).forEach(function(key) {
-					ClassService.getById(classIds[key].id).on('value', function(snapshot) {
+					Class.getById(classIds[key].id).on('value', function(snapshot) {
 						var classe = snapshot.val();
 						if (classe) {
 							classe.key = key;

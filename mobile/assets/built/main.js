@@ -190,6 +190,17 @@ var app = angular.module('ClassPictures');
 app.controller('ClassController', ['$scope', '$routeParams', '$location', 'Class', 'Image', ClassController]);
 
 function ClassController($scope, $routeParams, $location, Class, Image) {
+  $scope.safeApply = function(fn) {
+    var phase = this.$root.$$phase;
+    if(phase == '$apply' || phase == '$digest') {
+      if(fn && (typeof(fn) === 'function')) {
+        fn();
+      }
+    } else {
+      this.$apply(fn);
+    }
+  };
+
   $scope.class = {};
   Class.getById($routeParams.class).on('value', function(snapshot) {
     $scope.class = snapshot.val();
@@ -200,112 +211,152 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
         .getDownloadURL()
         .then(function(url) {
           image.url = url;
-          $scope.$apply();
+          $scope.safeApply();
         });
     });
-    $scope.$apply();
+    $scope.safeApply();
   });
   $scope.fileChanged = function(e) {
     var imageId = (new Date()).getTime()+'';
-    Image.getImage($routeParams.class, imageId)
-      .put(e.files[0]);
-    Class.getById($routeParams.class).child('images').push({
-      id: imageId,
-      owner: {
-        id: firebase.auth().currentUser.uid,
-        name: firebase.auth().currentUser.displayName
-      },
-      description: '',
-      isPublic: true
-    });
+    processfile(e.files[0], imageId);
   };
   $scope.gotoImage = function(image) {
     $location.path('photo/' + $routeParams.class + '/' + image.key);
   };
+
+  function processfile(file, imageId) {
+    var reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+    reader.onload = function(event) {
+      var blob = new Blob([event.target.result]);
+      var blobURL = URL.createObjectURL(blob);
+      var image = document.createElement('img');
+      image.src = blobURL;
+      image.onload = function() {
+        Image.getImage($routeParams.class, imageId)
+          .put(resize(image))
+          .then(function(snapshot) {
+            Class.getById($routeParams.class).child('images').push({
+              id: imageId,
+              owner: {
+                id: firebase.auth().currentUser.uid,
+                name: firebase.auth().currentUser.displayName
+              },
+              description: '',
+              isPublic: true
+            });
+          });
+      };
+    };
+  }
+
+  function resize(image) {
+    var canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    var context = canvas.getContext('2d');
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    canvas.className = 'ng-hide';
+    document.body.appendChild(canvas);
+    var quality = 0.2;
+    var dataURI = canvas.toDataURL('image/jpeg', quality);
+    var binary = atob(dataURI.split(',')[1]);
+    var array = [];
+    for (var i = 0; i < binary.length; i++)
+      array.push(binary.charCodeAt(i));
+    return new Blob([new Uint8Array(array)], {
+      type: 'image/jpeg'
+    });
+  }
 }
 })();
 
 
 /* FILE: mobile/assets/js/controllers/ClassesListController.js */
-(function () {
+(function() {
 
-var app = angular.module('ClassPictures');
+	var app = angular.module('ClassPictures');
 
-app.controller('ClassesListController', ['$scope', '$location', ClassesListController]);
+	app.controller('ClassesListController', ['$scope', 'UserService', 'Class', '$location', ClassesListController]);
 
-function ClassesListController($scope, $location) {
-	
-	var setMessage = function(){
-		var message;
-		if($scope.classes.length === 0){
-			message = "Adicionar novas disciplinas";
-		} else {
-			message = "Editar disciplinas cadastradas";
-		}
-		$scope.addClassButtonLabel = message;
-	};
-
-	$scope.addNewClassClick = function(){
-		$location.path("/selectClasses");
-	};
-
-	this.countMemberClass = function countMemberClass(group) {
-		var groupCount = group.members? group.members.length : 0;
-		var message = groupCount + (groupCount > 1 ? ' members' : ' member');
-		return message;
-	};
-
-	this.addClasses = function addClasses() {
-		$location.path('/createGroup');
-	};
-
-	this.openClass = function openClass(group){
-    	$location.path('class/' + group.id);
-	};
-
-	function buildSampleGroups() {
-		$scope.classes = [
-			{
-				id: 'EST032TM2',
-				name: 'Calculo Diferencial Integral III',
-				imagePath: 'https://unsplash.it/80/80/'
-			},
-			{
-				id: 2,
-				name: 'Fundamentos de Mecânia dos sólidos e Fluidos',
-				imagePath: 'https://unsplash.it/70/70/'
-			},
-			{
-				id: 3,
-				name: 'Equaçoes Diferencias A',
-				lastPosition: 'Favelinha loka',
-				members: [1, 2],
-				imagePath: 'https://unsplash.it/90/90/'
-			},
-			{
-				id: 5,
-				name: 'Análise de circuitos elétricos II',
-				lastPosition: 'Teknisa Service',
-				members: [1, 2],
-				imagePath: 'assets/images/icons/ic_view_headline_white_24px.svg'
-			},
-			{
-				id: 4,
-				name: 'Laboratório de Sistemas Digitais',
-				lastPosition: 'There is no last position to show',
-				members: [1, 2],
-				imagePath: 'https://unsplash.it/100/100/'
+	function ClassesListController($scope, UserService, Class, $location) {
+		var self = this;
+		$scope.classes = [];
+		$scope.safeApply = function(fn) {
+			if ($scope.$root && !$scope.$root.$$phase) {
+			var phase = this.$root.$$phase;
+			if (phase == '$apply' || phase == '$digest') {
+				if (fn && (typeof(fn) === 'function')) {
+					fn();
+				}
+			} else {
+				this.$apply(fn);
 			}
-		];
-	}
-	buildSampleGroups();
-	setMessage();
+		}
+		};
 
-}
+		function findClasse(item) {
+			return $scope.classes.find(function(classe) {
+				return (classe.id == item.id);
+			});
+		}
+		var setMessage = function() {
+			var message;
+			if ($scope.classes.length === 0) {
+				message = "Adicionar novas disciplinas";
+			} else {
+				message = "Editar disciplinas cadastradas";
+			}
+			$scope.addClassButtonLabel = message;
+		};
+
+		$scope.addNewClassClick = function() {
+			$location.path("/selectClasses");
+		};
+
+		this.countMemberClass = function countMemberClass(group) {
+			var groupCount = group.members ? group.members.length : 0;
+			var message = groupCount + (groupCount > 1 ? ' members' : ' member');
+			return message;
+		};
+
+		this.addClasses = function addClasses() {
+			$location.path('/createGroup');
+		};
+
+		this.openClass = function openClass(group) {
+			$location.path('class/' + group.id);
+		};
+
+
+		function buildSampleGroups() {
+			UserService.getUserClasses(firebase.auth().currentUser.uid).on('value', function(snapshot) {
+				var classIds = snapshot.val();
+				$scope.classes = [];
+				if (classIds) {
+					Object.keys(classIds).forEach(function(key) {
+						Class.getById(classIds[key].id).on('value', function(snapshot) {
+							var classe = snapshot.val();
+							if (classe) {
+								classe.key = key;
+								if (!findClasse(classe)) {
+									$scope.classes.push(classe);
+									setMessage();
+								}
+							}
+							$scope.safeApply();
+						});
+					});
+				}
+			});
+		}
+
+		buildSampleGroups();
+		setMessage();
+
+	}
 
 })();
-
-
 
 /* FILE: mobile/assets/js/controllers/ClassesSelectController.js */
 (function() {
@@ -317,6 +368,7 @@ function ClassesListController($scope, $location) {
 	function ClassesSelectController($scope, UserService, Class, $location) {
 		var self = this;
 		$scope.safeApply = function(fn) {
+			if ($scope.$root && !$scope.$root.$$phase) {
 			var phase = this.$root.$$phase;
 			if (phase == '$apply' || phase == '$digest') {
 				if (fn && (typeof(fn) === 'function')) {
@@ -325,15 +377,12 @@ function ClassesListController($scope, $location) {
 			} else {
 				this.$apply(fn);
 			}
+		}
 		};
-		$scope.allClasse = [];
-		Class.getAllClasses().then(function(requestData) {
-			$scope.allClasses = requestData.data.records.map(function(each) {
-				each.id = each.codigo_materia + each.turma;
-				return each;
-			});
-
-		});
+		$scope.allClasses = window.allClasses;
+		$scope.safeApply();
+		$scope.selectedClasses = [];
+		
 
 		UserService.getUserClasses(firebase.auth().currentUser.uid).on('value', function(snapshot) {
 			var classIds = snapshot.val();
@@ -344,7 +393,7 @@ function ClassesListController($scope, $location) {
 						var classe = snapshot.val();
 						if (classe) {
 							classe.key = key;
-							if(!findClasse(classe)){
+							if (!findClasse(classe)) {
 								$scope.selectedClasses.push(classe);
 							}
 						}
@@ -354,6 +403,18 @@ function ClassesListController($scope, $location) {
 			}
 		});
 
+		function uniqBy(a) {
+			var seen = {};
+			return a.filter(function(item) {
+				var k = item.id;
+				return seen.hasOwnProperty(k) ? false : (seen[k] = true);
+			});
+		}
+
+		$scope.$watch(function() {
+			$scope.selectedClasses = uniqBy($scope.selectedClasses);
+			return false;
+		});
 		// "nome_materia": "PROBABILIDADE",
 		// "codigo_materia": "EST032",
 		// "turma": "TM2",
@@ -366,7 +427,6 @@ function ClassesListController($scope, $location) {
 			$location.path('/classesList');
 		};
 
-		$scope.selectedClasses = [];
 
 		self.simulateQuery = false;
 		self.isDisabled = false;
@@ -427,9 +487,9 @@ function ClassesListController($scope, $location) {
 
 var app = angular.module('ClassPictures');
 
-app.controller('LoginController', ['$scope', '$location', LoginController]);
+app.controller('LoginController', ['$scope', '$location','Class', LoginController]);
 
-function LoginController($scope, $location) {
+function LoginController($scope, $location, Class) {
 	
 	var user;
 	var isToLogin = true;
@@ -445,6 +505,14 @@ function LoginController($scope, $location) {
 	      $location.path('/classesList');
 	    }
 	};
+	
+	Class.getAllClasses().then(function(requestData) {
+			window.allClasses = requestData.data.records.map(function(each) {
+				each.id = each.codigo_materia + each.turma;
+				return each;
+			});
+	});
+
 
 }
 
@@ -457,22 +525,24 @@ function LoginController($scope, $location) {
 
 var app = angular.module('ClassPictures');
 
-app.controller('PhotoController', ['$scope', '$routeParams', 'Image', 'Class', PhotoController]);
+app.controller('PhotoController', ['$scope', '$location', '$routeParams', 'Image', 'Class', PhotoController]);
 
-function PhotoController($scope, $routeParams, Image, Class) {
+function PhotoController($scope, $location, $routeParams, Image, Class) {
     $scope.image = {};
 
     //FOR NARNIA
     $scope.safeApply = function(fn) {
-        var phase = this.$root.$$phase;
-        if(phase == '$apply' || phase == '$digest') {
-            if(fn && (typeof(fn) === 'function')) {
-                fn();
+            if ($scope.$root && !$scope.$root.$$phase) {
+            var phase = this.$root.$$phase;
+            if (phase == '$apply' || phase == '$digest') {
+                if (fn && (typeof(fn) === 'function')) {
+                    fn();
+                }
+            } else {
+                this.$apply(fn);
             }
-        } else {
-            this.$apply(fn);
         }
-    };
+        };
 
     var metaData = Image.getImageMetadata($routeParams.classId, $routeParams.imageId);
     var storage = null;
@@ -484,7 +554,7 @@ function PhotoController($scope, $routeParams, Image, Class) {
 
     metaData.on('value', function(snapshot) {
         $scope.image = snapshot.val();
-        $scope.image.date = new Date($scope.image.id).toLocaleString();
+        $scope.image.date = new Date(+$scope.image.id).toLocaleString();
         $scope.image.title = $scope.image.owner.name + ': ' + $scope.image.date;
         $scope.safeApply();
 	    storage = Image.getImage($routeParams.classId, $scope.image.id);
@@ -492,7 +562,6 @@ function PhotoController($scope, $routeParams, Image, Class) {
 	        $scope.image.path = URL;
             $scope.safeApply();
 	    }.bind(this));
-
     });
 
     $scope.onChange = function(key) {
@@ -508,7 +577,10 @@ function PhotoController($scope, $routeParams, Image, Class) {
 
     $scope.delete = function () {
         metaData.remove().then(function() {
-            storage.delete().catch(function(error) {
+            storage.delete().then(function() {
+                $location.path('class/' + $routeParams.classId);
+                $scope.safeApply();
+            }).catch(function(error) {
                 console.log("Image deletion failed: " + error.message);
             });
         }).catch(function(error) {
@@ -517,6 +589,7 @@ function PhotoController($scope, $routeParams, Image, Class) {
     };
 }
 })();
+
 
 /* FILE: mobile/assets/js/controllers/SidenavController.js */
 (function () {
@@ -549,6 +622,11 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 		$mdSidenav('left').toggle();
 	};
 
+	this.editButtonClick = function(){
+		$location.path("/selectClasses");
+		$mdSidenav('left').toggle();
+	};
+
 	function buildLeftNavSettings () {
 		$scope.settings = [
 			{
@@ -559,23 +637,9 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 				checked : true
 			},
 			{
-				settingName: "Visibilidade",
-				iconPath: "assets/images/icons/ic_visibility_black_24px.svg",
-				onClickMethod: self.oi,
-				isCheckbox : true,
-				checked : true
-			},
-			{
-				settingName: "Perfil",
-				iconPath: "assets/images/icons/ic_person_black_24px.svg",
-				onClickMethod: self.oi,
-				isCheckbox : false,
-				checked : false
-			},
-			{
-				settingName: "Conta",
-				iconPath: "assets/images/icons/ic_vpn_key_black_24px.svg",
-				onClickMethod: self.oi,
+				settingName: "Editar minhas disciplinas",
+				iconPath: "assets/images/icons/ic_border_color_black_24px.svg",
+				onClickMethod: self.editButtonClick,
 				isCheckbox : false,
 				checked : false
 			},

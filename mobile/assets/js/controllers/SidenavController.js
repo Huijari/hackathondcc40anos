@@ -28,6 +28,11 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 		$mdSidenav('left').toggle();
 	};
 
+	this.editButtonClick = function(){
+		$location.path("/selectClasses");
+		$mdSidenav('left').toggle();
+	};
+
 	function buildLeftNavSettings () {
 		$scope.settings = [
 			{
@@ -38,23 +43,9 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 				checked : true
 			},
 			{
-				settingName: "Visibilidade",
-				iconPath: "assets/images/icons/ic_visibility_black_24px.svg",
-				onClickMethod: self.oi,
-				isCheckbox : true,
-				checked : true
-			},
-			{
-				settingName: "Perfil",
-				iconPath: "assets/images/icons/ic_person_black_24px.svg",
-				onClickMethod: self.oi,
-				isCheckbox : false,
-				checked : false
-			},
-			{
-				settingName: "Conta",
-				iconPath: "assets/images/icons/ic_vpn_key_black_24px.svg",
-				onClickMethod: self.oi,
+				settingName: "Editar minhas disciplinas",
+				iconPath: "assets/images/icons/ic_border_color_black_24px.svg",
+				onClickMethod: self.editButtonClick,
 				isCheckbox : false,
 				checked : false
 			},

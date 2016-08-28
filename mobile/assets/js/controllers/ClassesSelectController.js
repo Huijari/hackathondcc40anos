@@ -7,6 +7,7 @@
 	function ClassesSelectController($scope, UserService, Class, $location) {
 		var self = this;
 		$scope.safeApply = function(fn) {
+			if ($scope.$root && !$scope.$root.$$phase) {
 			var phase = this.$root.$$phase;
 			if (phase == '$apply' || phase == '$digest') {
 				if (fn && (typeof(fn) === 'function')) {
@@ -15,15 +16,12 @@
 			} else {
 				this.$apply(fn);
 			}
+		}
 		};
-		$scope.allClasse = [];
-		Class.getAllClasses().then(function(requestData) {
-			$scope.allClasses = requestData.data.records.map(function(each) {
-				each.id = each.codigo_materia + each.turma;
-				return each;
-			});
-
-		});
+		$scope.allClasses = window.allClasses;
+		$scope.safeApply();
+		$scope.selectedClasses = [];
+		
 
 		UserService.getUserClasses(firebase.auth().currentUser.uid).on('value', function(snapshot) {
 			var classIds = snapshot.val();
@@ -34,7 +32,7 @@
 						var classe = snapshot.val();
 						if (classe) {
 							classe.key = key;
-							if(!findClasse(classe)){
+							if (!findClasse(classe)) {
 								$scope.selectedClasses.push(classe);
 							}
 						}
@@ -44,6 +42,18 @@
 			}
 		});
 
+		function uniqBy(a) {
+			var seen = {};
+			return a.filter(function(item) {
+				var k = item.id;
+				return seen.hasOwnProperty(k) ? false : (seen[k] = true);
+			});
+		}
+
+		$scope.$watch(function() {
+			$scope.selectedClasses = uniqBy($scope.selectedClasses);
+			return false;
+		});
 		// "name": "PROBABILIDADE",
 		// "codigo_materia": "EST032",
 		// "turma": "TM2",
@@ -56,7 +66,6 @@
 			$location.path('/classesList');
 		};
 
-		$scope.selectedClasses = [];
 
 		self.simulateQuery = false;
 		self.isDisabled = false;

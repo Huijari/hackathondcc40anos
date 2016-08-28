@@ -15,7 +15,7 @@
 <div ng-controller="ClassController as menuCtrl" layout-fill>
   <md-content class="md-padding groups-container" layout="column" flex>
     <md-grid-list md-cols="4" md-row-height="1:1">
-      <md-grid-tile ng-repeat="image in class.images">
+      <md-grid-tile md-ink-ripple="#fff" ng-repeat="image in class.images" ng-click="gotoImage(image)">
         <img ng-src="{{image.url}}"/>
       </md-grid-tile>
     </md-grid-list>

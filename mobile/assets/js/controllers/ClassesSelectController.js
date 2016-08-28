@@ -1,9 +1,10 @@
 (function() {
 
 	var app = angular.module("ClassPictures");
-	app.controller('ClassesSelectController', ['$scope','UserService', 'ClassService', ClassesSelectController]);
 
-	function ClassesSelectController($scope, UserService, ClassService) {
+	app.controller('ClassesSelectController', ['$scope','UserService', 'ClassService', '$location', ClassesSelectController]);
+
+	function ClassesSelectController($scope, UserService, ClassService, $location) {
 		var self = this;
 		$scope.allClasse = [];
 		ClassService.getAllClasses().then(function(requestData){
@@ -23,6 +24,10 @@
 			// "hora_final": "14:40",
 			// "dia_semana": "Ter-Qui",
 			// "nome_sala": "1014"
+
+		self.backToClassesList = function() {
+			$location.path('/classesList');
+		};
 
 		$scope.selectedClasses = [];
 

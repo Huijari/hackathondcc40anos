@@ -23,10 +23,6 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 		});
 	};
 
-	this.chama = function() {
-		$location.path("/selectClasses");
-	};
-
 	function buildLeftNavSettings () {
 		$scope.settings = [
 			{
@@ -47,13 +43,6 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 				settingName: "Conta",
 				iconPath: "assets/images/icons/ic_vpn_key_black_24px.svg",
 				onClickMethod: self.oi,
-				isCheckbox : false,
-				checked : false
-			},
-			{
-				settingName: "Tela do Fabio",
-				iconPath: "assets/images/icons/ic_exit_to_app_black_24px.svg",
-				onClickMethod: self.chama ,
 				isCheckbox : false,
 				checked : false
 			},

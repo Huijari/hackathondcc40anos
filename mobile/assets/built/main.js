@@ -232,7 +232,7 @@ function ClassesListController($scope, $location) {
 	$scope.addClassButtonLabel = "Editar disciplinas cadastradas";
 
 	$scope.addNewClassClick = function(){
-		console.log("Adicionar nova disciplina");
+		$location.path("/selectClasses");
 	};
 
 	this.countMemberClass = function countMemberClass(group) {
@@ -296,9 +296,15 @@ function ClassesListController($scope, $location) {
 (function() {
 
 	var app = angular.module("ClassPictures");
+<<<<<<< HEAD
+	app.controller('ClassesSelectController', ['$scope', '$location', ClassesSelectController]);
+
+	function ClassesSelectController($scope, $location) {
+=======
 	app.controller('ClassesSelectController', ['$scope','UserService', 'ClassService', ClassesSelectController]);
 
 	function ClassesSelectController($scope, UserService, ClassService) {
+>>>>>>> 814df22415792765a613b856989e226287a95365
 		var self = this;
 		$scope.allClasse = [];
 		ClassService.getAllClasses().then(function(requestData){
@@ -318,6 +324,10 @@ function ClassesListController($scope, $location) {
 			// "hora_final": "14:40",
 			// "dia_semana": "Ter-Qui",
 			// "nome_sala": "1014"
+
+		self.backToClassesList = function() {
+			$location.path('/classesList');
+		};
 
 		$scope.selectedClasses = [];
 
@@ -458,10 +468,6 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 		});
 	};
 
-	this.chama = function() {
-		$location.path("/selectClasses");
-	};
-
 	function buildLeftNavSettings () {
 		$scope.settings = [
 			{
@@ -482,13 +488,6 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 				settingName: "Conta",
 				iconPath: "assets/images/icons/ic_vpn_key_black_24px.svg",
 				onClickMethod: self.oi,
-				isCheckbox : false,
-				checked : false
-			},
-			{
-				settingName: "Tela do Fabio",
-				iconPath: "assets/images/icons/ic_exit_to_app_black_24px.svg",
-				onClickMethod: self.chama ,
 				isCheckbox : false,
 				checked : false
 			},

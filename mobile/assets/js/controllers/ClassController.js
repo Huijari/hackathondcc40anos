@@ -28,7 +28,7 @@ function ClassController($scope, $routeParams, Class, Image) {
             id: imageId,
             owner: firebase.auth().currentUser.displayName,
             description: '',
-            isPublic: false
+            isPublic: true
           });
         });
       });

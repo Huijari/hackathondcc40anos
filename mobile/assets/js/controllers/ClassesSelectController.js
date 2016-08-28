@@ -1,9 +1,9 @@
 (function() {
 
 	var app = angular.module("ClassPictures");
-	app.controller('ClassesSelectController', ['$scope', ClassesSelectController]);
+	app.controller('ClassesSelectController', ['$scope', '$location', ClassesSelectController]);
 
-	function ClassesSelectController($scope, $timeout, $q, $log) {
+	function ClassesSelectController($scope, $location) {
 		var self = this;
 		$scope.allClasses = [{
 			"nome_materia": "PROBABILIDADE",
@@ -70,6 +70,10 @@
 			"dia_semana": "Ter-Qui",
 			"nome_sala": "1015"
 		}];
+
+		self.backToClassesList = function() {
+			$location.path('/classesList');
+		};
 
 		$scope.selectedClasses = [];
 

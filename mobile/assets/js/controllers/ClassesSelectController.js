@@ -34,7 +34,7 @@
 						var classe = snapshot.val();
 						if (classe) {
 							classe.key = key;
-							if(!findClasse(classe)){
+							if (!findClasse(classe)) {
 								$scope.selectedClasses.push(classe);
 							}
 						}
@@ -44,6 +44,18 @@
 			}
 		});
 
+		function uniqBy(a) {
+			var seen = {};
+			return a.filter(function(item) {
+				var k = item.id;
+				return seen.hasOwnProperty(k) ? false : (seen[k] = true);
+			})
+		}
+
+		$scope.$watch(function() {
+			$scope.selectedClasses = uniqBy($scope.selectedClasses);
+			return false;
+		});
 		// "nome_materia": "PROBABILIDADE",
 		// "codigo_materia": "EST032",
 		// "turma": "TM2",

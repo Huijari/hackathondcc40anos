@@ -8,6 +8,7 @@
 		var self = this;
 		$scope.classes = [];
 		$scope.safeApply = function(fn) {
+			if ($scope.$root && !$scope.$root.$$phase) {
 			var phase = this.$root.$$phase;
 			if (phase == '$apply' || phase == '$digest') {
 				if (fn && (typeof(fn) === 'function')) {
@@ -16,6 +17,7 @@
 			} else {
 				this.$apply(fn);
 			}
+		}
 		};
 
 		function findClasse(item) {
@@ -64,6 +66,7 @@
 								classe.key = key;
 								if (!findClasse(classe)) {
 									$scope.classes.push(classe);
+									setMessage();
 								}
 							}
 							$scope.safeApply();
@@ -72,6 +75,7 @@
 				}
 			});
 		}
+
 		buildSampleGroups();
 		setMessage();
 

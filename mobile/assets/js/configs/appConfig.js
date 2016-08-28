@@ -1,6 +1,6 @@
 (function () {
 
-var app = angular.module("ClassPictures", ["ngRoute", "ngMaterial"]);
+var app = angular.module("ClassPictures", ['angular-loading-bar', 'ngAnimate', "ngRoute", "ngMaterial"]);
 
 app.config(function($routeProvider, $locationProvider){
 		var initialPath = window.location.pathname;

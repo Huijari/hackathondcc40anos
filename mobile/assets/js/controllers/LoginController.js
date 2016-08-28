@@ -2,9 +2,9 @@
 
 var app = angular.module('ClassPictures');
 
-app.controller('LoginController', ['$scope', '$location', LoginController]);
+app.controller('LoginController', ['$scope', '$location','Class', LoginController]);
 
-function LoginController($scope, $location) {
+function LoginController($scope, $location, Class) {
 	
 	var user;
 	var isToLogin = true;
@@ -20,6 +20,14 @@ function LoginController($scope, $location) {
 	      $location.path('/classesList');
 	    }
 	};
+	
+	Class.getAllClasses().then(function(requestData) {
+			window.allClasses = requestData.data.records.map(function(each) {
+				each.id = each.codigo_materia + each.turma;
+				return each;
+			});
+	});
+
 
 }
 

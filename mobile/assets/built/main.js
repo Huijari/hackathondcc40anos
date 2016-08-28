@@ -283,6 +283,7 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
 		var self = this;
 		$scope.classes = [];
 		$scope.safeApply = function(fn) {
+			if ($scope.$root && !$scope.$root.$$phase) {
 			var phase = this.$root.$$phase;
 			if (phase == '$apply' || phase == '$digest') {
 				if (fn && (typeof(fn) === 'function')) {
@@ -291,6 +292,7 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
 			} else {
 				this.$apply(fn);
 			}
+		}
 		};
 
 		function findClasse(item) {
@@ -339,6 +341,7 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
 								classe.key = key;
 								if (!findClasse(classe)) {
 									$scope.classes.push(classe);
+									setMessage();
 								}
 							}
 							$scope.safeApply();
@@ -347,6 +350,7 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
 				}
 			});
 		}
+
 		buildSampleGroups();
 		setMessage();
 
@@ -364,6 +368,7 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
 	function ClassesSelectController($scope, UserService, Class, $location) {
 		var self = this;
 		$scope.safeApply = function(fn) {
+			if ($scope.$root && !$scope.$root.$$phase) {
 			var phase = this.$root.$$phase;
 			if (phase == '$apply' || phase == '$digest') {
 				if (fn && (typeof(fn) === 'function')) {
@@ -372,15 +377,12 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
 			} else {
 				this.$apply(fn);
 			}
+		}
 		};
-		$scope.allClasse = [];
-		Class.getAllClasses().then(function(requestData) {
-			$scope.allClasses = requestData.data.records.map(function(each) {
-				each.id = each.codigo_materia + each.turma;
-				return each;
-			});
-
-		});
+		$scope.allClasses = window.allClasses;
+		$scope.safeApply();
+		$scope.selectedClasses = [];
+		
 
 		UserService.getUserClasses(firebase.auth().currentUser.uid).on('value', function(snapshot) {
 			var classIds = snapshot.val();
@@ -425,7 +427,6 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
 			$location.path('/classesList');
 		};
 
-		$scope.selectedClasses = [];
 
 		self.simulateQuery = false;
 		self.isDisabled = false;
@@ -486,9 +487,9 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
 
 var app = angular.module('ClassPictures');
 
-app.controller('LoginController', ['$scope', '$location', LoginController]);
+app.controller('LoginController', ['$scope', '$location','Class', LoginController]);
 
-function LoginController($scope, $location) {
+function LoginController($scope, $location, Class) {
 	
 	var user;
 	var isToLogin = true;
@@ -504,6 +505,14 @@ function LoginController($scope, $location) {
 	      $location.path('/classesList');
 	    }
 	};
+	
+	Class.getAllClasses().then(function(requestData) {
+			window.allClasses = requestData.data.records.map(function(each) {
+				each.id = each.codigo_materia + each.turma;
+				return each;
+			});
+	});
+
 
 }
 
@@ -523,15 +532,17 @@ function PhotoController($scope, $location, $routeParams, Image, Class) {
 
     //FOR NARNIA
     $scope.safeApply = function(fn) {
-        var phase = this.$root.$$phase;
-        if(phase == '$apply' || phase == '$digest') {
-            if(fn && (typeof(fn) === 'function')) {
-                fn();
+            if ($scope.$root && !$scope.$root.$$phase) {
+            var phase = this.$root.$$phase;
+            if (phase == '$apply' || phase == '$digest') {
+                if (fn && (typeof(fn) === 'function')) {
+                    fn();
+                }
+            } else {
+                this.$apply(fn);
             }
-        } else {
-            this.$apply(fn);
         }
-    };
+        };
 
     var metaData = Image.getImageMetadata($routeParams.classId, $routeParams.imageId);
     var storage = null;

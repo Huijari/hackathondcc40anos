@@ -7,6 +7,7 @@
 	function ClassesSelectController($scope, UserService, Class, $location) {
 		var self = this;
 		$scope.safeApply = function(fn) {
+			if ($scope.$root && !$scope.$root.$$phase) {
 			var phase = this.$root.$$phase;
 			if (phase == '$apply' || phase == '$digest') {
 				if (fn && (typeof(fn) === 'function')) {
@@ -15,15 +16,12 @@
 			} else {
 				this.$apply(fn);
 			}
+		}
 		};
-		$scope.allClasse = [];
-		Class.getAllClasses().then(function(requestData) {
-			$scope.allClasses = requestData.data.records.map(function(each) {
-				each.id = each.codigo_materia + each.turma;
-				return each;
-			});
-
-		});
+		$scope.allClasses = window.allClasses;
+		$scope.safeApply();
+		$scope.selectedClasses = [];
+		
 
 		UserService.getUserClasses(firebase.auth().currentUser.uid).on('value', function(snapshot) {
 			var classIds = snapshot.val();
@@ -68,7 +66,6 @@
 			$location.path('/classesList');
 		};
 
-		$scope.selectedClasses = [];
 
 		self.simulateQuery = false;
 		self.isDisabled = false;

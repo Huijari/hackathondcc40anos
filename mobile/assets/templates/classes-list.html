@@ -21,7 +21,7 @@
 	</md-toolbar>
 	<md-content class="md-padding groups-container" layout="column">
 		<md-list flex>
-			<md-list-item class="md-3-line" ng-repeat="class in classes" ng-click="classesCtrl.openClass(class)" aria-label="{{ class.name }}">
+			<md-list-item class="md-3-line" ng-repeat="class in classes" ng-click="classesCtrl.openClass(class)" aria-label="{{ class.nome_categoria }}">
 				<div class="md-list-item-text" layout="column">
 					<h3 ng-bind="class.nome_materia"></h3>
 					<p> {{ class.codigo_materia + "   " +class.turma+"  "+class.dia_semana + "   " + class.hora_inicial+"-"+class.hora_final}} </p>
@@ -32,7 +32,7 @@
 				</div>
 			</md-list-item>
 
-			<md-list-item class="md-3-line" ng-click="addNewClassClick()" aria-label="{{ class.name }}">
+			<md-list-item class="md-3-line" ng-click="addNewClassClick()" aria-label="{{ class.nome_categoria }}">
 				<md-icon md-svg-icon="assets/images/icons/ic_border_color_black_24px.svg" class="md-primary md-hue-3"></md-icon>
 				<div class="md-list-item-text" layout="column">
 					<h3 id="label-add-class" ng-bind="addClassButtonLabel"></h3>

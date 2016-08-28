@@ -8,7 +8,7 @@ app.config(function($routeProvider, $locationProvider){
 
     // Install Service Worker
     navigator.serviceWorker
-      .register('../../../service-worker.js')
+      .register('service-worker.js')
       .then(function() {
         console.log('SW Install');
       });

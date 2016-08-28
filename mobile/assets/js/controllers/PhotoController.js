@@ -54,10 +54,10 @@ function PhotoController($scope, $routeParams, Image, Class) {
     $scope.delete = function () {
         metaData.remove().then(function() {
             storage.delete().catch(function(error) {
-                console.log("Image deletion failed: " + error.message)
+                console.log("Image deletion failed: " + error.message);
             });
         }).catch(function(error) {
-            console.log("Metadata removal failed: " + error.message)
+            console.log("Metadata removal failed: " + error.message);
         });
     };
 }

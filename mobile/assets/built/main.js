@@ -174,7 +174,7 @@ function ImageFactory() {
 			firebase.database().ref('user/'+ userId + "/classes").push().set({
 				id: classId
 			});
-			firebase.database().ref('class/' + classId).set(userClass);
+			firebase.database().ref('class/' + classId).update(userClass);
 		};
 	}
 
@@ -185,14 +185,15 @@ function ImageFactory() {
 
 var app = angular.module('ClassPictures');
 
-app.controller('ClassController', ['$scope', '$routeParams', 'Class', 'Image', ClassController]);
+app.controller('ClassController', ['$scope', '$routeParams', '$location', 'Class', 'Image', ClassController]);
 
-function ClassController($scope, $routeParams, Class, Image) {
+function ClassController($scope, $routeParams, $location, Class, Image) {
   $scope.class = {};
   Class.getById($routeParams.class).on('value', function(snapshot) {
     $scope.class = snapshot.val();
     Object.keys($scope.class.images).forEach(function(imageKey) {
       var image = $scope.class.images[imageKey];
+      image.key = imageKey;
       Image.getImage($routeParams.class, image.id)
         .getDownloadURL()
         .then(function(url) {
@@ -215,6 +216,9 @@ function ClassController($scope, $routeParams, Class, Image) {
       description: '',
       isPublic: true
     });
+  };
+  $scope.gotoImage = function(image) {
+    $location.path('photo/' + $routeParams.class + '/' + image.key);
   };
 }
 })();
@@ -329,7 +333,9 @@ function ClassesListController($scope, $location) {
 						var classe = snapshot.val();
 						if (classe) {
 							classe.key = key;
-							$scope.selectedClasses.push(classe);
+							if(!findClasse(classe)){
+								$scope.selectedClasses.push(classe);
+							}
 						}
 						$scope.safeApply();
 					});
@@ -369,11 +375,15 @@ function ClassesListController($scope, $location) {
 			return results;
 		}
 
+		function findClasse(item) {
+			return $scope.selectedClasses.find(function(classe) {
+				return (classe.id == item.id);
+			});
+		}
+
 		function selectedItemChange(item) {
 			if (item) {
-				if (!$scope.selectedClasses.find(function(classe) {
-						return (classe.id == item.id);
-					})) {
+				if (!findClasse(item)) {
 					UserService.addClass(item, firebase.auth().currentUser.uid);
 					$scope.selectedClasses.push(item);
 				}
@@ -454,6 +464,7 @@ function PhotoController($scope, $routeParams, Image, Class) {
     };
 
     var metaData = Image.getImageMetadata($routeParams.classId, $routeParams.imageId);
+    var storage = null;
 
     Class.getById($routeParams.classId).on('value', function(snapshot) {
         $scope.class = snapshot.val();
@@ -465,7 +476,8 @@ function PhotoController($scope, $routeParams, Image, Class) {
         $scope.image.date = new Date($scope.image.id).toLocaleString();
         $scope.image.title = $scope.image.owner.name + ': ' + $scope.image.date;
         $scope.safeApply();
-	    Image.getImage($routeParams.classId, $scope.image.id).getDownloadURL().then(function(URL) {
+	    storage = Image.getImage($routeParams.classId, $scope.image.id);
+        storage.getDownloadURL().then(function(URL) {
 	        $scope.image.path = URL;
             $scope.safeApply();
 	    }.bind(this));
@@ -481,6 +493,16 @@ function PhotoController($scope, $routeParams, Image, Class) {
 
     $scope.checkEdit = function() {
         return ($scope.image.owner)? $scope.image.owner.id !== firebase.auth().currentUser.uid : true;
+    };
+
+    $scope.delete = function () {
+        metaData.remove().then(function() {
+            storage.delete().catch(function(error) {
+                console.log("Image deletion failed: " + error.message);
+            });
+        }).catch(function(error) {
+            console.log("Metadata removal failed: " + error.message);
+        });
     };
 }
 })();

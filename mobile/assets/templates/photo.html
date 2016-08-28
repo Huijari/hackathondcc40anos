@@ -9,9 +9,6 @@
             <span flex=""></span>
         </div>
     </md-toolbar>
-    <section layout="row" layout-sm="column" layout-align="center center" layout-wrap="">
-      <md-button class="md-warn md-raised md-hue-2" ng-click="loginWithGoogleClick()">Logar com o Google</md-button>
-    </section>
 
     <div ng-controller="PhotoController" ng-cloak>
       <md-content class="md-padding" layout-xs="column" layout="row">
@@ -20,7 +17,7 @@
             <img ng-src="{{image.path}}" class="md-card-image">
             <md-card-actions layout="row" layout-align="space-between center">
               <md-card-title-text>
-                <span class="md-headline" ng-bind="image.date"/>
+                <span class="md-title" ng-bind="image.title"/>
               </md-card-title-text>
               <div layout="column" layout-align="space-around center">
                   <md-tooltip md-direction="left">Público</md-tooltip>

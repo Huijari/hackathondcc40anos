@@ -10,7 +10,7 @@ app.config(function($routeProvider, $locationProvider){
 
     // Install Service Worker
     navigator.serviceWorker
-      .register('../../../service-worker.js')
+      .register('service-worker.js')
       .then(function() {
         console.log('SW Install');
       });
@@ -57,7 +57,7 @@ app.config(function($routeProvider, $locationProvider){
 app.run(function($location){
 	firebase.auth().getRedirectResult().then(function(result){
 		if (result.user) {
-			$location.path(window.location.pathname +'classesList');
+			$location.path('/classesList');
 		}
 	});
 });
@@ -136,11 +136,11 @@ function ImageFactory() {
   };
 
   service.getImage = function(classId, imageId) {
-    return service.getByClass(classId).child(imageId).getDownloadURL();
+    return service.getByClass(classId).child(imageId+'');
   };
 
   service.getImageMetadata = function(classId, imageId) {
-    return firebase.database().ref(classId+'/images/'+imageId-1);
+    return firebase.database().ref('class/'+classId+'/images/'+imageId);
   };
 
   return service;
@@ -159,9 +159,15 @@ function ImageFactory() {
 
 		var userClasses = [];
 
+<<<<<<< HEAD
 		this.getUserClasses = function(userId) {
 			return firebase.database().ref("user/" + userId + "/classes");
 		};
+=======
+	this.getUserClasses = function(){
+		return userClasses; 
+	};
+>>>>>>> 96dde700d67ca609f95659f77e7064c1e793d8d4
 
 		this.removeClassById = function(classId, userId) {
 			return firebase.database().ref('user/' + userId + "/classes" + classId).remove().then(function() {
@@ -304,11 +310,18 @@ function ClassesListController($scope, $location) {
 
 		self.querySearch = querySearch;
 		self.selectedItemChange = selectedItemChange;
+<<<<<<< HEAD
 		self.removeSelection = function(classe) {
 			UserService.removeClassById(classe.codigo_materia + classe.turma, firebase.auth().currentUser);
 			$scope.selectedClasses.splice($scope.selectedClasses.indexOf(classe), 1);
 		};
 
+=======
+		self.removeSelection = function(classe){
+			$scope.selectedClasses.splice($scope.selectedClasses.indexOf(classe),1);
+		};
+		
+>>>>>>> 96dde700d67ca609f95659f77e7064c1e793d8d4
 		function querySearch(query) {
 			var results = query ? $scope.allClasses.filter(createFilterFor(query)) : $scope.allClasses;
 			return results;
@@ -386,13 +399,26 @@ app.controller('PhotoController', ['$scope', '$routeParams', 'Image', PhotoContr
 function PhotoController($scope, $routeParams, Image) {
     $scope.image = {};
 
-    Image.getImage($routeParams.classId, $routeParams.imageId).then(function(URL) {
-      $scope.image.path = URL;
-      Image.getImageMetadata($routeParams.classId, $routeParams.imageId).on('value', function(snapshot) {
+    var metaData = Image.getImageMetadata($routeParams.classId, $routeParams.imageId);
+    metaData.on('value', function(snapshot) {
         $scope.image = snapshot.val();
-        $scope.image.date = new Date($scope.image.timestamp*1000).toLocaleString();
+        $scope.image.date = new Date($scope.image.id).toLocaleString();
+        $scope.image.title = $scope.image.owner + ': ' + $scope.image.date;
         $scope.$apply();
-      });
+	    Image.getImage($routeParams.classId, $scope.image.id).getDownloadURL().then(function(URL) {
+	        $scope.image.path = URL;
+	    });
+    });
+
+    metaData.set({
+        id: $scope.image.id,
+        owner: $scope.image.owner,
+        description: $scope.image.description,
+        isPublic: $scope.image.isPublic
+    }).then(function() {
+        console.log('Synchronization succeeded');
+    }).catch(function(error) {
+        console.log('Synchronization failed: ' + error);
     });
 }
 })();
@@ -419,10 +445,10 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 
 	this.logOut = function logOut(){
 		firebase.auth().signOut().then(function(){
-			$location.path(window.initialPath);
-			$scope.$apply();
+			$location.path("/");
 		});
 	};
+
 	this.chama = function() {
 		$location.path("/selectClasses");
 	};

@@ -21,7 +21,7 @@
 	</md-toolbar>
 	<md-content class="md-padding groups-container" layout="column">
 		<md-list flex>
-			<md-list-item class="md-3-line" ng-repeat="class in classes" ng-click="classesCtrl.openGroup(group)" aria-label="{{ group.name }}">
+			<md-list-item class="md-3-line" ng-repeat="class in classes" ng-click="classesCtrl.openGroup(class)" aria-label="{{ group.name }}">
 				<img ng-src="{{class.imagePath}}" class="md-avatar" alt="{{igroup.name}}" />
 				<div class="md-list-item-text" layout="column">
 					<h3 ng-bind="class.name"></h3>
@@ -40,7 +40,7 @@
 		</md-list>
 
 		<button id="add-class-buttom" ng-click="classesCtrl.addGroup()" class="md-fab md-fab-bottom-right md-button md-ink-ripple pp-fixed" type="button" aria-label="Add">
-			<md-icon md-svg-icon="assets/images/icons/ic_note_add_white_24px.svg"></md-icon>
+			<md-icon md-svg-icon="assets/images/icons/ic_camera_alt_white_24px.svg"></md-icon>
 		</button>
 
 	</md-content>

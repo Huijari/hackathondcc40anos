@@ -97,6 +97,8 @@
 					UserService.addClass(item, firebase.auth().currentUser.uid);
 					$scope.selectedClasses.push(item);
 				}
+				$scope.searchText = "";
+				$scope.safeApply();
 			}
 		}
 

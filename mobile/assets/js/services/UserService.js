@@ -8,7 +8,7 @@ function UserService() {
 
 	var userClasses = [];
 
-	this.getsUerClasses = function(){
+	this.getUserClasses = function(){
 		return userClasses; 
 	};
 

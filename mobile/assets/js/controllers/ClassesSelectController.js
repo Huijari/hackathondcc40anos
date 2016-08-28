@@ -69,7 +69,11 @@
 
 		self.simulateQuery = false;
 		self.isDisabled = false;
-
+		self.redirect = function(classe){
+			if(classe){
+				$location.path('class/'+classe.id);
+			}
+		}
 		self.querySearch = querySearch;
 		self.selectedItemChange = selectedItemChange;
 		self.removeSelection = function(classe) {

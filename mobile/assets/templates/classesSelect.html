@@ -13,8 +13,8 @@
         <br>
         <md-divider></md-divider>
         <md-subheader class="md-no-sticky">Disciplinas</md-subheader>
-        <md-list flex>
-            <md-list-item class="md-2-line" ng-click="null" ng-repeat="classe in selectedClasses">
+        <md-list flex ">
+            <md-list-item class="md-2-line" ng-click="CsCtrl.redirect(classe)"  ng-repeat="classe in selectedClasses">
                 <div class="md-list-item-text">
                     <h3 id="label-nome"> {{ classe.nome_materia }} </h3>
                     <p> {{ classe.codigo_materia + "   " +classe.turma+"  "+classe.dia_semana + "   " + classe.hora_inicial+"-"+classe.hora_final}} </p>

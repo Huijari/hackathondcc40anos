@@ -9,15 +9,17 @@ function PhotoController($scope, $location, $routeParams, Image, Class) {
 
     //FOR NARNIA
     $scope.safeApply = function(fn) {
-        var phase = this.$root.$$phase;
-        if(phase == '$apply' || phase == '$digest') {
-            if(fn && (typeof(fn) === 'function')) {
-                fn();
+            if ($scope.$root && !$scope.$root.$$phase) {
+            var phase = this.$root.$$phase;
+            if (phase == '$apply' || phase == '$digest') {
+                if (fn && (typeof(fn) === 'function')) {
+                    fn();
+                }
+            } else {
+                this.$apply(fn);
             }
-        } else {
-            this.$apply(fn);
         }
-    };
+        };
 
     var metaData = Image.getImageMetadata($routeParams.classId, $routeParams.imageId);
     var storage = null;

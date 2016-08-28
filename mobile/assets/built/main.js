@@ -10,7 +10,7 @@ app.config(function($routeProvider, $locationProvider){
 
     // Install Service Worker
     navigator.serviceWorker
-      .register('/service-worker.js')
+      .register('../../../service-worker.js')
       .then(function() {
         console.log('SW Install');
       });
@@ -83,6 +83,21 @@ app.directive('ppSidenav', function() {
 })();
 
 
+
+/* FILE: mobile/assets/js/directives/classesSelectList.js */
+(function () {
+
+var app = angular.module("ClassPictures");
+
+app.directive('classesSelect', function() {
+	return {
+		restrict: 'E',
+		link: function(scope, element, attrs) {},
+		templateUrl: 'assets/templates/classesSelect.html'
+	};
+});
+
+})();
 
 /* FILE: mobile/assets/js/services/ClassService.js */
 (function () {
@@ -164,7 +179,7 @@ function ClassController($scope, $routeParams, Class, Image) {
   Class.getById($routeParams.class).on('value', function(snapshot) {
     $scope.class = snapshot.val();
     $scope.class.images.forEach(function(image) {
-      Image.getByClass($routeParams.class).child(image.id + '.jpg')
+      Image.getByClass($routeParams.class).child(''+image.id)
         .getDownloadURL().then(function(url) {
           image.url = url;
           $scope.$apply();
@@ -182,9 +197,9 @@ function ClassController($scope, $routeParams, Class, Image) {
 
 var app = angular.module('ClassPictures');
 
-app.controller('ClassesListController', ['$scope', ClassesListController]);
+app.controller('ClassesListController', ['$scope', '$location', ClassesListController]);
 
-function ClassesListController($scope) {
+function ClassesListController($scope, $location) {
 
 	$scope.addClassButtonLabel = "Editar disciplinas cadastradas";
 
@@ -210,7 +225,7 @@ function ClassesListController($scope) {
 	function buildSampleGroups() {
 		$scope.classes = [
 			{
-				id: 1,
+				id: 'EST032TM2',
 				name: 'Calculo Diferencial Integral III',
 				imagePath: 'https://unsplash.it/80/80/'
 			},
@@ -249,6 +264,123 @@ function ClassesListController($scope) {
 })();
 
 
+
+/* FILE: mobile/assets/js/controllers/ClassesSelectController.js */
+(function() {
+
+	var app = angular.module("ClassPictures");
+	app.controller('ClassesSelectController', ['$scope', ClassesSelectController]);
+
+	function ClassesSelectController($scope, $timeout, $q, $log) {
+		var self = this;
+		$scope.allClasses = [{
+			"nome_materia": "PROBABILIDADE",
+			"codigo_materia": "EST032",
+			"turma": "TM2",
+			"hora_inicial": "13:00",
+			"hora_final": "14:40",
+			"dia_semana": "Ter-Qui",
+			"nome_sala": "1014"
+		}, {
+			"nome_materia": "ESTATISTICA E PROBABILIDADES",
+			"codigo_materia": "EST031",
+			"turma": "TB1",
+			"hora_inicial": "09:25",
+			"hora_final": "11:05",
+			"dia_semana": "Ter-Qui",
+			"nome_sala": "1015"
+		}, {
+			"nome_materia": "ESTATISTICA E PROBABILIDADES",
+			"codigo_materia": "EST031",
+			"turma": "TE",
+			"hora_inicial": "19:00",
+			"hora_final": "20:40",
+			"dia_semana": "Ter",
+			"nome_sala": "1015"
+		}, {
+			"nome_materia": "ESTATISTICA E PROBABILIDADES",
+			"codigo_materia": "EST031",
+			"turma": "TE",
+			"hora_inicial": "20:55",
+			"hora_final": "22:35",
+			"dia_semana": "Qui",
+			"nome_sala": "1015"
+		}, {
+			"nome_materia": "ESTATISTICA E PROBABILIDADES",
+			"codigo_materia": "EST031",
+			"turma": "TW",
+			"hora_inicial": "19:00",
+			"hora_final": "20:40",
+			"dia_semana": "Seg-Qua",
+			"nome_sala": "1015"
+		}, {
+			"nome_materia": "PROBABILIDADE",
+			"codigo_materia": "EST032",
+			"turma": "TE",
+			"hora_inicial": "20:55",
+			"hora_final": "22:35",
+			"dia_semana": "Ter",
+			"nome_sala": "1015"
+		}, {
+			"nome_materia": "PROBABILIDADE",
+			"codigo_materia": "EST032",
+			"turma": "TE",
+			"hora_inicial": "19:00",
+			"hora_final": "20:40",
+			"dia_semana": "Qui",
+			"nome_sala": "1015"
+		}, {
+			"nome_materia": "PROBABILIDADE",
+			"codigo_materia": "EST032",
+			"turma": "TM1",
+			"hora_inicial": "13:00",
+			"hora_final": "14:40",
+			"dia_semana": "Ter-Qui",
+			"nome_sala": "1015"
+		}];
+
+		$scope.selectedClasses = [];
+
+		self.simulateQuery = false;
+		self.isDisabled = false;
+
+		self.querySearch = querySearch;
+		self.selectedItemChange = selectedItemChange;
+		function querySearch(query) {
+			var results = query ? $scope.allClasses.filter(createFilterFor(query)) : $scope.allClasses;
+			return results;
+		}
+
+		function selectedItemChange(item) {
+			if (item) {
+				if (! $scope.selectedClasses.find(function(classe) {
+						return (classe.codigo_materia == item.codigo_materia) && (classe.turma == item.turma);
+					})) {
+					$scope.selectedClasses.push(item);
+				}
+			}
+		}
+
+		/**
+		 * Create filter function for a query string
+		 */
+		function createFilterFor(query) {
+			var lowercaseQuery = angular.lowercase(query);
+			var words = lowercaseQuery.split(" ");
+			return function filterFn(classe) {
+				var a = words.every(function(word) {
+					var b = Object.keys(classe).some(function(prop) {
+						return ~angular.lowercase(classe[prop]).indexOf(word);
+					});
+					return b; 
+				});;
+				return a; 
+			};
+		}
+	}
+
+
+})();
 
 /* FILE: mobile/assets/js/controllers/LoginController.js */
 (function () {

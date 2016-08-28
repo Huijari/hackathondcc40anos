@@ -9,7 +9,7 @@ function ClassController($scope, $routeParams, Class, Image) {
   Class.getById($routeParams.class).on('value', function(snapshot) {
     $scope.class = snapshot.val();
     $scope.class.images.forEach(function(image) {
-      Image.getByClass($routeParams.class).child(image.id + '.jpg')
+      Image.getByClass($routeParams.class).child(''+image.id)
         .getDownloadURL().then(function(url) {
           image.url = url;
           $scope.$apply();

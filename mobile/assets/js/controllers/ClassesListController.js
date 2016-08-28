@@ -2,9 +2,9 @@
 
 var app = angular.module('ClassPictures');
 
-app.controller('ClassesListController', ['$scope', ClassesListController]);
+app.controller('ClassesListController', ['$scope', '$location', ClassesListController]);
 
-function ClassesListController($scope) {
+function ClassesListController($scope, $location) {
 
 	$scope.addClassButtonLabel = "Editar disciplinas cadastradas";
 
@@ -30,7 +30,7 @@ function ClassesListController($scope) {
 	function buildSampleGroups() {
 		$scope.classes = [
 			{
-				id: 1,
+				id: 'EST032TM2',
 				name: 'Calculo Diferencial Integral III',
 				imagePath: 'https://unsplash.it/80/80/'
 			},

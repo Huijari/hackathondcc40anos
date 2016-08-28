@@ -186,6 +186,12 @@ app.controller('ClassesListController', ['$scope', ClassesListController]);
 
 function ClassesListController($scope) {
 
+	$scope.addClassButtonLabel = "Editar disciplinas cadastradas";
+
+	$scope.addNewClassClick = function(){
+		console.log("Adicionar nova disciplina");
+	};
+
 	this.countMemberClass = function countMemberClass(group) {
 		var groupCount = group.members? group.members.length : 0;
 		var message = groupCount + (groupCount > 1 ? ' members' : ' member');
@@ -193,16 +199,16 @@ function ClassesListController($scope) {
 	};
 
 	this.addClasses = function addClasses() {
-		$location.path(window.location.pathname +'createGroup');
+		$location.path('/createGroup');
 	};
 
 	this.openGroup = function openGroup(group){
-		$location.path(window.location.pathname +'group');
+		$location.path('/group');
 		GroupService.setOpenedGroup(group);
 	};
 	
 	function buildSampleGroups() {
-		$scope.groups = [
+		$scope.classes = [
 			{
 				id: 1,
 				name: 'Calculo Diferencial Integral III',
@@ -221,23 +227,23 @@ function ClassesListController($scope) {
 				imagePath: 'https://unsplash.it/90/90/'
 			},
 			{
+				id: 5,
+				name: 'Análise de circuitos elétricos II',
+				lastPosition: 'Teknisa Service',
+				members: [1, 2],
+				imagePath: 'assets/images/icons/ic_view_headline_white_24px.svg'
+			},
+			{
 				id: 4,
 				name: 'Laboratório de Sistemas Digitais',
 				lastPosition: 'There is no last position to show',
 				members: [1, 2],
 				imagePath: 'https://unsplash.it/100/100/'
-			},
-			{
-				id: 5,
-				name: 'Análise de circuitos elétricos II',
-				lastPosition: 'Teknisa Service',
-				members: [1, 2],
-				imagePath: 'https://unsplash.it/110/110/'
 			}
 		];
 	}
-
 	buildSampleGroups();
+
 }
 
 })();

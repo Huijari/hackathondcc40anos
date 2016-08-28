@@ -33,7 +33,7 @@
                 <textarea ng-disabled="checkEdit()" ng-change="onChange('description')" ng-model="image.description"></textarea>
               </md-input-container>
             </md-card-content>
-            <md-card-footer layout="row" style="background-color: #D50000" ng-click="delete()" layout-align="space-around center">
+            <md-card-footer layout="row" style="background-color: #D50000" ng-if="!checkEdit()" ng-click="delete()" layout-align="space-around center">
               <md-icon style="-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;">delete</md-icon>
             </md-card-footer>
           </md-card>

@@ -12,18 +12,6 @@
 		var self = this;
 		var provider = new firebase.auth.GoogleAuthProvider();
 		provider.addScope('https://www.googleapis.com/auth/plus.login');
-		$scope.safeApply = function(fn) {
-			if ($scope.$root && !$scope.$root.$$phase) {
-				var phase = this.$root.$$phase;
-				if (phase == '$apply' || phase == '$digest') {
-					if (fn && (typeof(fn) === 'function')) {
-						fn();
-					}
-				} else {
-					this.$apply(fn);
-				}
-			}
-		};
 
 		Class.getAllClasses().then(function(requestData) {
 			window.allClasses = requestData.data.records.map(function(each) {
@@ -38,7 +26,16 @@
 			} else {
 				$location.path('/classesList');
 			}
-			$scope.$safeApply();
+			if ($scope.$root && !$scope.$root.$$phase) {
+				var phase = $scope.$root.$$phase;
+				if (phase == '$apply' || phase == '$digest') {
+					if (fn && (typeof(fn) === 'function')) {
+						fn();
+					}
+				} else {
+					$scope.$apply(fn);
+				}
+			}
 		};
 	}
 

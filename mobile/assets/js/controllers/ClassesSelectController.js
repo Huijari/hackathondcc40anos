@@ -44,7 +44,7 @@
 			}
 		});
 
-		// "nome_materia": "PROBABILIDADE",
+		// "name": "PROBABILIDADE",
 		// "codigo_materia": "EST032",
 		// "turma": "TM2",
 		// "hora_inicial": "13:00",

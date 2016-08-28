@@ -1,9 +1,9 @@
 <div ng-controller="ClassesSelectController as CsCtrl">
     <md-content class="md-padding groups-container" layout="column">
         <h2 class="md-title">Adicionar Disciplina</h2>
-        <md-autocomplete class="md-block" ng-disabled="CsCtrl.isDisabled" md-no-cache="CsCtrl.noCache" md-selected-item="CsCtrl.selectedItem" md-search-text-change="CsCtrl.searchTextChange(CsCtrl.searchText)" md-search-text="CsCtrl.searchText" md-selected-item-change="CsCtrl.selectedItemChange(item)" md-items="item in CsCtrl.querySearch(CsCtrl.searchText)" md-item-text="item.nome_materia" md-min-length="0" placeholder="Select a class">
+        <md-autocomplete class="md-block" ng-disabled="CsCtrl.isDisabled" md-no-cache="CsCtrl.noCache" md-selected-item="CsCtrl.selectedItem" md-search-text-change="CsCtrl.searchTextChange(CsCtrl.searchText)" md-search-text="CsCtrl.searchText" md-selected-item-change="CsCtrl.selectedItemChange(item)" md-items="item in CsCtrl.querySearch(CsCtrl.searchText)" md-item-text="item.name" md-min-length="0" placeholder="Select a class">
             <md-item-template>
-               <span md-highlight-text="CsCtrl.searchText" md-highlight-flags="^i">{{item.codigo_materia+"  "+ item.turma+" "+item.nome_materia}}</span>
+               <span md-highlight-text="CsCtrl.searchText" md-highlight-flags="^i">{{item.codigo_materia+"  "+ item.turma+" "+item.name}}</span>
             </md-item-template>
             <md-not-found>
                 No classes matching "{{CsCtrl.searchText}}" were found.
@@ -16,7 +16,7 @@
         <md-list flex>
             <md-list-item class="md-2-line" ng-click="null" ng-repeat="classe in selectedClasses">
                 <div class="md-list-item-text">
-                    <h3> {{ classe.nome_materia }} </h3>
+                    <h3> {{ classe.name }} </h3>
                     <p> {{ classe.codigo_materia + "   " +classe.turma+"  "+classe.dia_semana + "   " + classe.hora_inicial+"-"+classe.hora_final}} </p>
                 </div>
                 <md-icon class="md-secondary" ng-click="CsCtrl.removeSelection(classe)" aria-label="Remove">delete</md-icon>

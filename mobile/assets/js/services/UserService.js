@@ -23,7 +23,7 @@
 			firebase.database().ref('user/'+ userId + "/classes").push().set({
 				id: classId
 			});
-			firebase.database().ref('class/' + classId).set(userClass);
+			firebase.database().ref('class/' + classId).update(userClass);
 		};
 	}
 

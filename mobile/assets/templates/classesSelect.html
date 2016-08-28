@@ -3,7 +3,7 @@
         <h2 class="md-title">Adicionar Disciplina</h2>
         <md-autocomplete class="md-block" ng-disabled="CsCtrl.isDisabled" md-no-cache="CsCtrl.noCache" md-selected-item="CsCtrl.selectedItem" md-search-text-change="CsCtrl.searchTextChange(CsCtrl.searchText)" md-search-text="CsCtrl.searchText" md-selected-item-change="CsCtrl.selectedItemChange(item)" md-items="item in CsCtrl.querySearch(CsCtrl.searchText)" md-item-text="item.nome_materia" md-min-length="0" placeholder="Select a class">
             <md-item-template>
-                <span md-highlight-text="CsCtrl.searchText" md-highlight-flags="^i">{{item.nome_materia}}</span>
+               <span md-highlight-text="CsCtrl.searchText" md-highlight-flags="^i">{{item.codigo_materia+"  "+ item.turma+" "+item.nome_materia}}</span>
             </md-item-template>
             <md-not-found>
                 No classes matching "{{CsCtrl.searchText}}" were found.
@@ -14,10 +14,10 @@
         <md-divider></md-divider>
         <md-subheader class="md-no-sticky">Disciplinas</md-subheader>
         <md-list flex>
-            <md-list-item class="md-3-line" ng-click="null" ng-repeat="classe in selectedClasses">
+            <md-list-item class="md-2-line" ng-click="null" ng-repeat="classe in selectedClasses">
                 <div class="md-list-item-text">
                     <h3> {{ classe.nome_materia }} </h3>
-                    <p> {{ classe.dia_semana }} </p>
+                    <p> {{ classe.codigo_materia + "   " +classe.turma+"  "+classe.dia_semana + "   " + classe.hora_inicial+"-"+classe.hora_final}} </p>
                 </div>
                 <md-icon class="md-secondary" ng-click="CsCtrl.removeSelection(classe)" aria-label="Remove">delete</md-icon>
             </md-list-item>

@@ -207,7 +207,7 @@ function ClassController($scope, $routeParams, Class, Image) {
             id: imageId,
             owner: firebase.auth().currentUser.displayName,
             description: '',
-            isPublic: false
+            isPublic: true
           });
         });
       });
@@ -241,8 +241,8 @@ function ClassesListController($scope, $location) {
 		$location.path('/createGroup');
 	};
 
-	this.openGroup = function openGroup(group){
-    $location.path(window.location.pathname + 'class/' + group.id);
+	this.openClass = function openClass(group){
+    	$location.path('class/' + group.id);
 	};
 
 	function buildSampleGroups() {
@@ -292,15 +292,10 @@ function ClassesListController($scope, $location) {
 (function() {
 
 	var app = angular.module("ClassPictures");
-<<<<<<< HEAD
-	app.controller('ClassesSelectController', ['$scope', '$location', ClassesSelectController]);
 
-	function ClassesSelectController($scope, $location) {
-=======
-	app.controller('ClassesSelectController', ['$scope','UserService', 'ClassService', ClassesSelectController]);
+	app.controller('ClassesSelectController', ['$scope','UserService', 'ClassService', '$location', ClassesSelectController]);
 
-	function ClassesSelectController($scope, UserService, ClassService) {
->>>>>>> 814df22415792765a613b856989e226287a95365
+	function ClassesSelectController($scope, UserService, ClassService, $location) {
 		var self = this;
 		$scope.allClasse = [];
 		ClassService.getAllClasses().then(function(requestData){

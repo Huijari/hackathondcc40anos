@@ -2,14 +2,15 @@
 
 var app = angular.module('ClassPictures');
 
-app.controller('ClassController', ['$scope', '$routeParams', 'Class', 'Image', ClassController]);
+app.controller('ClassController', ['$scope', '$routeParams', '$location', 'Class', 'Image', ClassController]);
 
-function ClassController($scope, $routeParams, Class, Image) {
+function ClassController($scope, $routeParams, $location, Class, Image) {
   $scope.class = {};
   Class.getById($routeParams.class).on('value', function(snapshot) {
     $scope.class = snapshot.val();
     Object.keys($scope.class.images).forEach(function(imageKey) {
       var image = $scope.class.images[imageKey];
+      image.key = imageKey;
       Image.getImage($routeParams.class, image.id)
         .getDownloadURL()
         .then(function(url) {
@@ -32,6 +33,9 @@ function ClassController($scope, $routeParams, Class, Image) {
       description: '',
       isPublic: true
     });
+  };
+  $scope.gotoImage = function(image) {
+    $location.path('photo/' + $routeParams.class + '/' + image.key);
   };
 }
 })();

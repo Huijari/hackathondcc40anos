@@ -10,7 +10,7 @@ app.config(function($routeProvider, $locationProvider){
 
     // Install Service Worker
     navigator.serviceWorker
-      .register('../../../service-worker.js')
+      .register('service-worker.js')
       .then(function() {
         console.log('SW Install');
       });
@@ -133,11 +133,11 @@ function ImageFactory() {
   };
 
   service.getImage = function(classId, imageId) {
-    return service.getByClass(classId).child(imageId).getDownloadURL();
+    return service.getByClass(classId).child(imageId+'');
   };
 
   service.getImageMetadata = function(classId, imageId) {
-    return firebase.database().ref(classId+'/images/'+imageId-1);
+    return firebase.database().ref('class/'+classId+'/images/'+imageId);
   };
 
   return service;
@@ -156,7 +156,7 @@ function UserService() {
 
 	var userClasses = [];
 
-	this.getsUerClasses = function(){
+	this.getUserClasses = function(){
 		return userClasses; 
 	};
 
@@ -348,7 +348,8 @@ function ClassesListController($scope, $location) {
 		self.selectedItemChange = selectedItemChange;
 		self.removeSelection = function(classe){
 			$scope.selectedClasses.splice($scope.selectedClasses.indexOf(classe),1);
-		}
+		};
+		
 		function querySearch(query) {
 			var results = query ? $scope.allClasses.filter(createFilterFor(query)) : $scope.allClasses;
 			return results;
@@ -425,13 +426,26 @@ app.controller('PhotoController', ['$scope', '$routeParams', 'Image', PhotoContr
 function PhotoController($scope, $routeParams, Image) {
     $scope.image = {};
 
-    Image.getImage($routeParams.classId, $routeParams.imageId).then(function(URL) {
-      $scope.image.path = URL;
-      Image.getImageMetadata($routeParams.classId, $routeParams.imageId).on('value', function(snapshot) {
+    var metaData = Image.getImageMetadata($routeParams.classId, $routeParams.imageId);
+    metaData.on('value', function(snapshot) {
         $scope.image = snapshot.val();
-        $scope.image.date = new Date($scope.image.timestamp*1000).toLocaleString();
+        $scope.image.date = new Date($scope.image.id).toLocaleString();
+        $scope.image.title = $scope.image.owner + ': ' + $scope.image.date;
         $scope.$apply();
-      });
+	    Image.getImage($routeParams.classId, $scope.image.id).getDownloadURL().then(function(URL) {
+	        $scope.image.path = URL;
+	    });
+    });
+
+    metaData.set({
+        id: $scope.image.id,
+        owner: $scope.image.owner,
+        description: $scope.image.description,
+        isPublic: $scope.image.isPublic
+    }).then(function() {
+        console.log('Synchronization succeeded');
+    }).catch(function(error) {
+        console.log('Synchronization failed: ' + error);
     });
 }
 })();

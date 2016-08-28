@@ -26,9 +26,12 @@ function ClassController($scope, $routeParams, Class, Image) {
         uploadTask.on('complete', function() {
           Class.getById($routeParams.class).ref('images').push({
             id: imageId,
-            owner: firebase.auth().currentUser.displayName,
+            owner: {
+              id: firebase.auth().currentUser.id,
+              name: firebase.auth().currentUser.displayName
+            },
             description: '',
-            isPublic: false
+            isPublic: true
           });
         });
       });

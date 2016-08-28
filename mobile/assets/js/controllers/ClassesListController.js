@@ -9,7 +9,7 @@ function ClassesListController($scope, $location) {
 	$scope.addClassButtonLabel = "Editar disciplinas cadastradas";
 
 	$scope.addNewClassClick = function(){
-		console.log("Adicionar nova disciplina");
+		$location.path("/selectClasses");
 	};
 
 	this.countMemberClass = function countMemberClass(group) {

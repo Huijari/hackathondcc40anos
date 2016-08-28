@@ -218,21 +218,56 @@ function ClassController($scope, $routeParams, $location, Class, Image) {
   });
   $scope.fileChanged = function(e) {
     var imageId = (new Date()).getTime()+'';
-    Image.getImage($routeParams.class, imageId)
-      .put(e.files[0]);
-    Class.getById($routeParams.class).child('images').push({
-      id: imageId,
-      owner: {
-        id: firebase.auth().currentUser.uid,
-        name: firebase.auth().currentUser.displayName
-      },
-      description: '',
-      isPublic: true
-    });
+    processfile(e.files[0], imageId);
   };
   $scope.gotoImage = function(image) {
     $location.path('photo/' + $routeParams.class + '/' + image.key);
   };
+
+  function processfile(file, imageId) {
+    var reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+    reader.onload = function(event) {
+      var blob = new Blob([event.target.result]);
+      var blobURL = URL.createObjectURL(blob);
+      var image = document.createElement('img');
+      image.src = blobURL;
+      image.onload = function() {
+        Image.getImage($routeParams.class, imageId)
+          .put(resize(image))
+          .then(function(snapshot) {
+            Class.getById($routeParams.class).child('images').push({
+              id: imageId,
+              owner: {
+                id: firebase.auth().currentUser.uid,
+                name: firebase.auth().currentUser.displayName
+              },
+              description: '',
+              isPublic: true
+            });
+          });
+      };
+    };
+  }
+
+  function resize(image) {
+    var canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    var context = canvas.getContext('2d');
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    canvas.className = 'ng-hide';
+    document.body.appendChild(canvas);
+    var quality = 0.2;
+    var dataURI = canvas.toDataURL('image/jpeg', quality);
+    var binary = atob(dataURI.split(',')[1]);
+    var array = [];
+    for (var i = 0; i < binary.length; i++)
+      array.push(binary.charCodeAt(i));
+    return new Blob([new Uint8Array(array)], {
+      type: 'image/jpeg'
+    });
+  }
 }
 })();
 
@@ -576,6 +611,11 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 		$mdSidenav('left').toggle();
 	};
 
+	this.editButtonClick = function(){
+		$location.path("/selectClasses");
+		$mdSidenav('left').toggle();
+	};
+
 	function buildLeftNavSettings () {
 		$scope.settings = [
 			{
@@ -586,23 +626,9 @@ app.controller("SidenavController", ["$scope", "$location", "$mdSidenav", functi
 				checked : true
 			},
 			{
-				settingName: "Visibilidade",
-				iconPath: "assets/images/icons/ic_visibility_black_24px.svg",
-				onClickMethod: self.oi,
-				isCheckbox : true,
-				checked : true
-			},
-			{
-				settingName: "Perfil",
-				iconPath: "assets/images/icons/ic_person_black_24px.svg",
-				onClickMethod: self.oi,
-				isCheckbox : false,
-				checked : false
-			},
-			{
-				settingName: "Conta",
-				iconPath: "assets/images/icons/ic_vpn_key_black_24px.svg",
-				onClickMethod: self.oi,
+				settingName: "Editar minhas disciplinas",
+				iconPath: "assets/images/icons/ic_border_color_black_24px.svg",
+				onClickMethod: self.editButtonClick,
 				isCheckbox : false,
 				checked : false
 			},

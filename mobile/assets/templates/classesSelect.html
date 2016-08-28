@@ -16,7 +16,7 @@
         <md-list flex>
             <md-list-item class="md-2-line" ng-click="null" ng-repeat="classe in selectedClasses">
                 <div class="md-list-item-text">
-                    <h3> {{ classe.nome_materia }} </h3>
+                    <h3 id="label-nome"> {{ classe.nome_materia }} </h3>
                     <p> {{ classe.codigo_materia + "   " +classe.turma+"  "+classe.dia_semana + "   " + classe.hora_inicial+"-"+classe.hora_final}} </p>
                 </div>
                 <md-icon class="md-secondary" ng-click="CsCtrl.removeSelection(classe)" aria-label="Remove">delete</md-icon>

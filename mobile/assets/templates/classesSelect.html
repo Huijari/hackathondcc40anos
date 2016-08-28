@@ -1,28 +1,26 @@
 <div ng-controller="ClassesSelectController as CsCtrl">
     <md-content class="md-padding groups-container" layout="column">
-        <md-toolbar layout="row" class="md-hue-4">
-            <div class="md-toolbar-tools">
-                <span>battaata</span>
-            </div>
-        </md-toolbar>
-        <md-content>
-            <md-autocomplete ng-disabled="CsCtrl.isDisabled" md-no-cache="CsCtrl.noCache" md-selected-item="CsCtrl.selectedItem" md-search-text-change="CsCtrl.searchTextChange(CsCtrl.searchText)" md-search-text="CsCtrl.searchText" md-selected-item-change="CsCtrl.selectedItemChange(item)" md-items="item in CsCtrl.querySearch(CsCtrl.searchText)" md-item-text="item.nome_materia" md-min-length="0" placeholder="Select a class">
-                <md-item-template>
-                    <span md-highlight-text="CsCtrl.searchText" md-highlight-flags="^i">{{item.nome_materia}}</span>
-                </md-item-template>
-                <md-not-found>
-                    No classes matching "{{CsCtrl.searchText}}" were found.
-                </md-not-found>
-            </md-autocomplete>
-            <md-list flex>
-                <md-list-item class="md-3-line" ng-click="null" ng-repeat="classe in selectedClasses">
-                    <div class="md-list-item-text">
-                        <h3> {{ classe.nome_materia }} </h3>
-                        <p> {{ classe.dia_semana }} </p>
-                    </div>
-                    <md-icon class="md-secondary" ng-click="CsCtrl.removeSelection($event)" aria-label="Remove" md-svg-icon="delete"></md-icon>
-                </md-list-item>
-            </md-list>
-        </md-content>
+        <h2 class="md-title">Adicionar Disciplina</h2>
+        <md-autocomplete class="md-block" ng-disabled="CsCtrl.isDisabled" md-no-cache="CsCtrl.noCache" md-selected-item="CsCtrl.selectedItem" md-search-text-change="CsCtrl.searchTextChange(CsCtrl.searchText)" md-search-text="CsCtrl.searchText" md-selected-item-change="CsCtrl.selectedItemChange(item)" md-items="item in CsCtrl.querySearch(CsCtrl.searchText)" md-item-text="item.nome_materia" md-min-length="0" placeholder="Select a class">
+            <md-item-template>
+                <span md-highlight-text="CsCtrl.searchText" md-highlight-flags="^i">{{item.nome_materia}}</span>
+            </md-item-template>
+            <md-not-found>
+                No classes matching "{{CsCtrl.searchText}}" were found.
+            </md-not-found>
+            <md-divider></md-divider>
+        </md-autocomplete>
+        <br>
+        <md-divider></md-divider>
+        <md-subheader class="md-no-sticky">Disciplinas</md-subheader>
+        <md-list flex>
+            <md-list-item class="md-3-line" ng-click="null" ng-repeat="classe in selectedClasses">
+                <div class="md-list-item-text">
+                    <h3> {{ classe.nome_materia }} </h3>
+                    <p> {{ classe.dia_semana }} </p>
+                </div>
+                <md-icon class="md-secondary" ng-click="CsCtrl.removeSelection(classe)" aria-label="Remove">delete</md-icon>
+            </md-list-item>
+        </md-list>
     </md-content>
 </div>

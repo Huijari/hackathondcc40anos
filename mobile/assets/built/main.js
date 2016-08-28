@@ -346,6 +346,9 @@ function ClassesListController($scope, $location) {
 
 		self.querySearch = querySearch;
 		self.selectedItemChange = selectedItemChange;
+		self.removeSelection = function(classe){
+			$scope.selectedClasses.splice($scope.selectedClasses.indexOf(classe),1);
+		}
 		function querySearch(query) {
 			var results = query ? $scope.allClasses.filter(createFilterFor(query)) : $scope.allClasses;
 			return results;

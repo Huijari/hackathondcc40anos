@@ -10,7 +10,7 @@ app.config(function($routeProvider, $locationProvider){
 
     // Install Service Worker
     navigator.serviceWorker
-      .register('/service-worker.js')
+      .register('../../../service-worker.js')
       .then(function() {
         console.log('SW Install');
       });
@@ -179,7 +179,7 @@ function ClassController($scope, $routeParams, Class, Image) {
   Class.getById($routeParams.class).on('value', function(snapshot) {
     $scope.class = snapshot.val();
     $scope.class.images.forEach(function(image) {
-      Image.getByClass($routeParams.class).child(image.id + '.jpg')
+      Image.getByClass($routeParams.class).child(''+image.id)
         .getDownloadURL().then(function(url) {
           image.url = url;
           $scope.$apply();
@@ -197,9 +197,9 @@ function ClassController($scope, $routeParams, Class, Image) {
 
 var app = angular.module('ClassPictures');
 
-app.controller('ClassesListController', ['$scope', ClassesListController]);
+app.controller('ClassesListController', ['$scope', '$location', ClassesListController]);
 
-function ClassesListController($scope) {
+function ClassesListController($scope, $location) {
 
 	this.countMemberClass = function countMemberClass(group) {
 		var groupCount = group.members? group.members.length : 0;
@@ -212,14 +212,13 @@ function ClassesListController($scope) {
 	};
 
 	this.openGroup = function openGroup(group){
-		$location.path(window.location.pathname +'group');
-		GroupService.setOpenedGroup(group);
+		$location.path(window.location.pathname + 'class/' + group.id);
 	};
 	
 	function buildSampleGroups() {
 		$scope.groups = [
 			{
-				id: 1,
+				id: 'EST032TM2',
 				name: 'Calculo Diferencial Integral III',
 				imagePath: 'https://unsplash.it/80/80/'
 			},
@@ -340,6 +339,9 @@ function ClassesListController($scope) {
 
 		self.querySearch = querySearch;
 		self.selectedItemChange = selectedItemChange;
+		self.removeSelection = function(classe){
+			$scope.selectedClasses.splice($scope.selectedClasses.indexOf(classe),1);
+		}
 		function querySearch(query) {
 			var results = query ? $scope.allClasses.filter(createFilterFor(query)) : $scope.allClasses;
 			return results;
@@ -367,7 +369,7 @@ function ClassesListController($scope) {
 						return ~angular.lowercase(classe[prop]).indexOf(word);
 					});
 					return b; 
-				});;
+				});
 				return a; 
 			};
 		}

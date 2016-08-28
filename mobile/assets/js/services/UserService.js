@@ -7,6 +7,7 @@
 	function UserService() {
 
 		var userClasses = [];
+		var user = {};
 
 		this.getUserClasses = function(userId) {
 			return firebase.database().ref("user/" + userId + "/classes");
@@ -25,6 +26,7 @@
 			});
 			firebase.database().ref('class/' + classId).set(userClass);
 		};
+
 	}
 
 })();

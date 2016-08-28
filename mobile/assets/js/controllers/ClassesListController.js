@@ -5,8 +5,16 @@ var app = angular.module('ClassPictures');
 app.controller('ClassesListController', ['$scope', '$location', ClassesListController]);
 
 function ClassesListController($scope, $location) {
-
-	$scope.addClassButtonLabel = "Editar disciplinas cadastradas";
+	
+	var setMessage = function(){
+		var message;
+		if($scope.classes.length === 0){
+			message = "Adicionar novas disciplinas";
+		} else {
+			message = "Editar disciplinas cadastradas";
+		}
+		$scope.addClassButtonLabel = message;
+	};
 
 	$scope.addNewClassClick = function(){
 		$location.path("/selectClasses");
@@ -62,6 +70,7 @@ function ClassesListController($scope, $location) {
 		];
 	}
 	buildSampleGroups();
+	setMessage();
 
 }
 

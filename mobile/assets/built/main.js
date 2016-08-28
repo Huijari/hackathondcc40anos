@@ -159,15 +159,9 @@ function ImageFactory() {
 
 		var userClasses = [];
 
-<<<<<<< HEAD
 		this.getUserClasses = function(userId) {
 			return firebase.database().ref("user/" + userId + "/classes");
 		};
-=======
-	this.getUserClasses = function(){
-		return userClasses; 
-	};
->>>>>>> 96dde700d67ca609f95659f77e7064c1e793d8d4
 
 		this.removeClassById = function(classId, userId) {
 			return firebase.database().ref('user/' + userId + "/classes" + classId).remove().then(function() {
@@ -194,15 +188,30 @@ function ClassController($scope, $routeParams, Class, Image) {
   Class.getById($routeParams.class).on('value', function(snapshot) {
     $scope.class = snapshot.val();
     $scope.class.images.forEach(function(image) {
-      Image.getByClass($routeParams.class).child(''+image.id)
-        .getDownloadURL().then(function(url) {
+      Image.getImage($routeParams.class, image.id)
+        .getDownloadURL()
+        .then(function(url) {
           image.url = url;
           $scope.$apply();
         });
     });
     $scope.$apply();
   });
-  console.log(Image.getByClass($routeParams.class));
+  $scope.fileChanged = function(e) {
+    var imageId = (new Date()).getTime()+'';
+    Image.getImage($routeParams.class, imageId)
+      .put(e.files[0])
+      .then(function(uploadTask) {
+        uploadTask.on('complete', function() {
+          Class.getById($routeParams.class).ref('images').push({
+            id: imageId,
+            owner: firebase.auth().currentUser.displayName,
+            description: '',
+            isPublic: false
+          });
+        });
+      });
+  };
 }
 })();
 
@@ -233,10 +242,9 @@ function ClassesListController($scope, $location) {
 	};
 
 	this.openGroup = function openGroup(group){
-		$location.path('/group');
-		GroupService.setOpenedGroup(group);
+    $location.path(window.location.pathname + 'class/' + group.id);
 	};
-	
+
 	function buildSampleGroups() {
 		$scope.classes = [
 			{
@@ -310,18 +318,10 @@ function ClassesListController($scope, $location) {
 
 		self.querySearch = querySearch;
 		self.selectedItemChange = selectedItemChange;
-<<<<<<< HEAD
 		self.removeSelection = function(classe) {
 			UserService.removeClassById(classe.codigo_materia + classe.turma, firebase.auth().currentUser);
 			$scope.selectedClasses.splice($scope.selectedClasses.indexOf(classe), 1);
 		};
-
-=======
-		self.removeSelection = function(classe){
-			$scope.selectedClasses.splice($scope.selectedClasses.indexOf(classe),1);
-		};
-		
->>>>>>> 96dde700d67ca609f95659f77e7064c1e793d8d4
 		function querySearch(query) {
 			var results = query ? $scope.allClasses.filter(createFilterFor(query)) : $scope.allClasses;
 			return results;
@@ -358,6 +358,7 @@ function ClassesListController($scope, $location) {
 
 
 })();
+
 
 /* FILE: mobile/assets/js/controllers/LoginController.js */
 (function () {
